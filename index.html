@@ -16,6 +16,7 @@
 /* ポートフォリオの中身。単体ページ（:root）とマイツールの囲い（:host）の両方で使う。build.py が両方に差し込む */
 /* 2026-11-01 見直し：アートディレクターのポートフォリオを参考に「雑誌のような」見た目へ。白い地・細いセリフ体の大きな英字・画像が先・番号つきの事例 */
 /* 書体：英字の見出しは Cormorant Garamond、日本語の見出しとキャッチは明朝（Shippori Mincho）、本文は細いゴシック（Zen Kaku Gothic New）。2026-11-01 たくみが3案から C を選んだ。差し色は群青1色。幅は画面いっぱい（2026-11-01 たくみ）。左右の余白は画面の幅に合わせて 16〜64px、文の行だけ 46em までに抑える */
+/* 2026-11-01 frontend-design の見直し：大文字の英字ラベル・「—」の飾り・1語だけの強調・事例の重複をなくし、文字の大きさを 12／15（本文）／18／24／大見出しの段にそろえた */
 /* :not(#_) は、マイツール側の明暗の指定より強くするための書き方（このページはいつも白） */
 :root:not(#_), :host(:not(#_)) {
   --bg: #f6f6f3; --surface: #ffffff; --sunken: #ecece8; --ink: #141517; --muted: #686c73; --line: #d8d8d2;
@@ -31,7 +32,7 @@
 :host { display: block; }
 body { background: var(--bg); }
 .pf, .pf * { box-sizing: border-box; }
-.pf { min-height: 100vh; background: var(--bg); color: var(--ink); font: 14px/1.9 var(--font); letter-spacing: .03em;
+.pf { min-height: 100vh; background: var(--bg); color: var(--ink); font: 15px/1.9 var(--font); letter-spacing: .03em;
   padding-inline: var(--gut); overflow-x: clip; }
 .pf h1, .pf h2, .pf h3, .pf p { margin: 0; }
 .pf h1, .pf h2, .pf h3 { line-height: 1.4; text-wrap: balance; }
@@ -46,14 +47,14 @@ body { background: var(--bg); }
 .hero h1, .sec-h, .case-h h3, .work-h h3, .story h3, .strength h3, .timeline h3, .vision, .profile-name span { font-family: var(--mincho); font-weight: 500; letter-spacing: .06em; }
 
 /* 記入待ち：色と言葉の両方で出す */
-.todo { background: var(--warn-soft); color: var(--warn); border-radius: 4px; padding: 0 4px; font: 500 13px/1.6 var(--font); letter-spacing: 0; }
+.todo { background: var(--warn-soft); color: var(--warn); border-radius: 4px; padding: 0 4px; font: 500 12px/1.6 var(--font); letter-spacing: 0; }
 .note { font-size: 12px; color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 6px 12px; justify-self: start; margin-bottom: -88px; }
 
 /* 仮の画像：グレーの面に、何の画像かを小さく書く。本物の画像ができたら差し替える */
 .ph { position: relative; overflow: hidden; background: var(--ph); aspect-ratio: 16 / 9; }
 .ph::before { content: ""; position: absolute; inset: 0; transition: transform 1.6s cubic-bezier(.2, .7, .2, 1);
   background: repeating-linear-gradient(115deg, transparent 0 46px, rgba(0, 0, 0, .035) 46px 47px), linear-gradient(160deg, var(--ph-2), var(--ph)); }
-.ph-tag { position: absolute; left: 14px; bottom: 12px; font: 400 11px/1.4 var(--font); letter-spacing: .12em; color: rgba(20, 21, 23, .55); }
+.ph-tag { position: absolute; left: 14px; bottom: 12px; font: 400 12px/1.4 var(--font); letter-spacing: .12em; color: rgba(20, 21, 23, .55); }
 a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 
 /* 上の帯：名前と目次。スクロールしても上に貼り付く。マイツールの中ではスマホの上のバー（48px）の下に付く（--toc-top） */
@@ -61,8 +62,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   display: flex; align-items: baseline; gap: 24px; white-space: nowrap; overflow-x: auto; scrollbar-width: none;
   background: color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
 .toc::-webkit-scrollbar { display: none; }
-.toc .brand { font: 400 15px/1 var(--serif); letter-spacing: .28em; color: var(--ink); margin-right: auto; }
-.toc a { font: 400 13px/1 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding-block: 4px; transition: color .3s; }
+.toc .brand { font: 400 18px/1 var(--serif); letter-spacing: .04em; color: var(--ink); margin-right: auto; }
+.toc a { font: 400 15px/1 var(--serif); letter-spacing: .08em; color: var(--muted); text-decoration: none; padding-block: 4px; transition: color .3s; }
 .toc a:hover { color: var(--ink); }
 .toc a.brand { color: var(--ink); }
 
@@ -79,49 +80,42 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .hero-ring circle { fill: none; stroke: rgba(243, 243, 240, .22); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .hero-in { position: relative; width: 100%; padding: 0 var(--gut) clamp(40px, 8vh, 96px); display: grid; gap: 18px; }
 .hero-name { font: 300 clamp(72px, 15vw, 232px)/.86 var(--serif); letter-spacing: .01em; margin-left: -.04em; }
-.hero-role { font: 300 clamp(18px, 2.2vw, 28px)/1.3 var(--serif); letter-spacing: .14em; text-transform: uppercase; color: rgba(243, 243, 240, .78); }
-.hero-role i { font-style: italic; text-transform: none; }
-.hero h1 { font-size: clamp(20px, 2.4vw, 30px); font-weight: 400; letter-spacing: .12em; }
-.hero h1 em { font-style: normal; border-bottom: 1px solid currentColor; }
-.scroll { position: absolute; right: var(--gut); bottom: clamp(40px, 8vh, 96px); writing-mode: vertical-rl; font: 400 11px/1 var(--serif); letter-spacing: .4em; color: rgba(243, 243, 240, .7); display: flex; align-items: center; gap: 12px; }
+.hero-role { font: 300 clamp(18px, 2.2vw, 24px)/1.3 var(--serif); letter-spacing: .04em; color: rgba(243, 243, 240, .78); }
+.hero h1 { font-size: clamp(18px, 2.2vw, 24px); font-weight: 400; letter-spacing: .12em; }
+.scroll { position: absolute; right: var(--gut); bottom: clamp(40px, 8vh, 96px); writing-mode: vertical-rl; font: 400 12px/1 var(--serif); letter-spacing: .2em; color: rgba(243, 243, 240, .7); display: flex; align-items: center; gap: 12px; }
 .scroll::after { content: ""; width: 1px; height: 56px; background: currentColor; }
 
-/* 大きな見出し（Home・Work・About・Contact）。縦書きの小さな英字ラベルを右に添える */
+/* 大きな見出し（Work・About・Contact）。大文字にはしない */
 .group { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 72px; scroll-margin-top: calc(var(--toc-top, 0px) + 40px); }
 .group-h { display: grid; gap: 8px; border-bottom: 1px solid var(--ink); padding-bottom: 16px; }
-.group-h h2 { font: 300 clamp(64px, 12vw, 184px)/.85 var(--serif); letter-spacing: .02em; text-transform: uppercase; margin-left: -.04em; }
-.group-h p { font-size: 13px; color: var(--muted); letter-spacing: .06em; }
-.vlabel { position: absolute; right: 0; top: 4px; writing-mode: vertical-rl; font: 400 11px/1 var(--serif); letter-spacing: .5em; color: var(--muted); text-transform: uppercase; }
+.group-h h2 { font: 300 clamp(64px, 12vw, 184px)/.85 var(--serif); letter-spacing: .01em; margin-left: -.04em; }
+.group-h p { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
 
-/* まとまりの中の見出し：小さな英字＋日本語 */
+/* まとまりの中の見出し：日本語だけ */
 .sec { display: grid; gap: 24px; scroll-margin-top: calc(var(--toc-top, 0px) + 64px); }
-.sec-h { display: flex; align-items: baseline; gap: 16px; font-size: 15px; font-weight: 500; letter-spacing: .06em; }
-.sec-h .en { font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
-.sec > .sub { font-size: 13px; color: var(--muted); max-width: 46em; margin-top: -12px; }
+.sec-h { font-size: 18px; font-weight: 500; letter-spacing: .06em; }
+.sec > .sub { font-size: 12px; color: var(--muted); max-width: 46em; margin-top: -12px; }
 
 /* はじめの一言：英字の大きな文と、日本語の説明 */
 .intro { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px 64px; align-items: end; }
 .statement { font: 300 clamp(40px, 5.6vw, 84px)/1.02 var(--serif); letter-spacing: .01em; }
-.statement i { font-style: italic; color: var(--accent); }
 .statement span { display: block; }
 .statement span:nth-child(2) { padding-left: 1.2em; }
 .statement span:nth-child(3) { padding-left: .5em; }
 .intro-txt { display: grid; gap: 20px; }
 .lead { font-size: 15px; max-width: 32em; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font: 400 13px/1.6 var(--serif); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.chips li::before { content: "— "; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 12px; color: var(--muted); }
 
 /* 数字で見る：大きなセリフ体の数字を、細い線で区切って並べる */
 .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .kpi { display: grid; gap: 6px; align-content: start; padding: 20px 24px 8px 0; }
 .kpi + .kpi { border-left: 1px solid var(--line); padding-left: 24px; }
 .kpi .n { font: 300 12px/1 var(--serif); letter-spacing: .2em; color: var(--muted); }
-.kpi span { font-size: 13px; color: var(--muted); }
+.kpi span { font-size: 12px; color: var(--muted); }
 .kpi b { font: 300 clamp(36px, 4.4vw, 64px)/1.1 var(--serif); font-variant-numeric: tabular-nums; }
 .kpi b .todo { font-size: 15px; }
 .kpi b small { font-size: .45em; color: var(--muted); }
 .award { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin: 0; padding: 16px 0; border-block: 1px solid var(--line); }
-.award .en { font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
 .award b { font: 500 clamp(18px, 2vw, 24px)/1.4 var(--mincho); letter-spacing: .06em; }
 .award small { font-size: 12px; color: var(--muted); }
 
@@ -129,7 +123,6 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .clients { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); column-gap: 32px; border-top: 1px solid var(--ink); }
 .clients li { display: grid; gap: 2px; padding: 20px 0; border-bottom: 1px solid var(--line); }
 .clients b { font: 500 clamp(18px, 2vw, 24px)/1.4 var(--mincho); letter-spacing: .04em; }
-.clients span { font: 400 12px/1.4 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
 .kpi small { font-size: 12px; color: var(--muted); }
 
 /* 事例：画像が先、その下に「番号・分類・年」と大きな英字の題、課題 → 打ち手 → 結果 */
@@ -137,14 +130,13 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .case > .ph { aspect-ratio: 21 / 9; }
 .case + .case { margin-top: 72px; }
 .case-top { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px 32px; align-items: start; }
-.case-meta { display: grid; gap: 6px; font: 400 12px/1.3 var(--serif); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); padding-top: 6px; }
+.case-meta { display: grid; gap: 6px; font: 400 12px/1.3 var(--font); letter-spacing: .06em; color: var(--muted); padding-top: 6px; }
 .case-meta .num { font: 300 64px/.9 var(--serif); letter-spacing: 0; color: var(--ink); }
 .case-en { font: 300 clamp(40px, 5.4vw, 80px)/1 var(--serif); letter-spacing: .01em; margin-bottom: 12px; }
 .case-h { display: grid; gap: 8px; }
-.case-h h3 { font-size: 17px; font-weight: 500; }
-.case-h .outcome { font-size: 14px; font-weight: 700; color: var(--accent); }
+.case-h h3 { font-size: 18px; font-weight: 500; }
 /* 案件の基本情報（doda・リクルートエージェントが挙げる、期間・体制・役割・ツール） */
-.facts { margin: 8px 0 0; display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 4px 16px; font-size: 13px; max-width: 46em; }
+.facts { margin: 8px 0 0; display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 4px 16px; font-size: 12px; max-width: 46em; }
 .facts dt { color: var(--muted); font-size: 12px; padding-top: 1px; }
 .facts dd { margin: 0; }
 .rows { margin-left: 192px; border-top: 1px solid var(--line); }
@@ -166,8 +158,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .work .ph { aspect-ratio: 4 / 3; }
 .work-h { display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
 .work-h .num { font: 300 13px/1 var(--serif); letter-spacing: .2em; color: var(--muted); }
-.work-h h3 { font-size: 17px; font-weight: 500; }
-.work p { font-size: 13px; color: var(--muted); max-width: 40em; }
+.work-h h3 { font-size: 18px; font-weight: 500; }
+.work p { font-size: 15px; color: var(--muted); max-width: 40em; }
 .nums { font: 400 12px/1.6 var(--serif); letter-spacing: .14em; color: var(--ink); }
 
 /* 自己紹介：左に縦長の似顔絵（いまは仮）、右に名前と「いま・理由・大事にしていること」 */
@@ -178,42 +170,39 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .profile { display: grid; gap: 28px; }
 .profile-name { display: grid; gap: 4px; }
 .profile-name b { font: 300 clamp(44px, 5vw, 72px)/1 var(--serif); letter-spacing: .06em; }
-.profile-name span { font-size: 13px; color: var(--muted); letter-spacing: .06em; }
-.profile dl { margin: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 16px; font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+.profile-name span { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+.profile dl { margin: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 16px; border-top: 1px solid var(--line); padding-top: 16px; }
 .profile dt { color: var(--muted); font-size: 12px; }
 .profile dd { margin: 0; }
 .story { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 40px; }
-.story h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
-.story p { font-size: 14px; }
+.story h3 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
 
 /* 強みとスキル */
 .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
 .strength { display: grid; gap: 8px; align-content: start; border-top: 1px solid var(--ink); padding-top: 16px; }
 .strength .num { font: 300 40px/1 var(--serif); }
-.strength h3 { font-size: 16px; font-weight: 500; }
-.strength p { font-size: 13px; color: var(--muted); }
+.strength h3 { font-size: 18px; font-weight: 500; }
+.strength p { font-size: 15px; color: var(--muted); }
 .skills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; border-top: 1px solid var(--line); padding-top: 20px; }
-.skills h3 { font: 400 13px/1.4 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.skills ul { margin: 0; padding: 0; list-style: none; font-size: 13px; display: grid; gap: 2px; }
+.skills h3 { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+.skills ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
 
 /* 経歴 */
 .timeline { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .timeline li { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px 32px; padding: 20px 0; border-bottom: 1px solid var(--line); }
-.timeline time { font: 300 28px/1.1 var(--serif); font-variant-numeric: tabular-nums; }
-.timeline h3 { font-size: 15px; font-weight: 500; }
-.timeline p { font-size: 13px; color: var(--muted); max-width: 46em; }
+.timeline time { font: 300 24px/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+.timeline h3 { font-size: 18px; font-weight: 500; }
+.timeline p { font-size: 15px; color: var(--muted); max-width: 46em; }
 
 /* これから：大きな一文 */
-.vision { font-size: clamp(20px, 2.4vw, 30px); font-weight: 400; line-height: 1.7; letter-spacing: .04em; max-width: 30em; }
-.vision b { font-weight: 500; color: var(--accent); }
+.vision { font-size: clamp(18px, 2.2vw, 24px); font-weight: 400; line-height: 1.7; letter-spacing: .04em; max-width: 30em; }
 
 /* 連絡先 */
 .contact { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 0 32px; margin: 0; border-top: 1px solid var(--line); }
 .contact dt, .contact dd { padding: 20px 0; border-bottom: 1px solid var(--line); }
-.contact dt { font: 400 13px/1.6 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.contact dt { font-size: 12px; color: var(--muted); }
 .contact dd { margin: 0; font-size: 18px; }
 .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
-.foot .en { letter-spacing: .2em; }
 
 @media (max-width: 899px) {
   .pf-in { padding-block: 32px 48px; gap: 88px; }
@@ -228,7 +217,6 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   .case-meta { grid-auto-flow: column; justify-content: start; align-items: end; gap: 16px; }
   .case-meta .num { font-size: 44px; }
   .rows { margin-left: 0; }
-  .vlabel { display: none; }
   .scroll { display: none; }
   .hero-ring { right: -30vmin; width: 110vmin; }
 }
@@ -236,24 +224,24 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   .skills { grid-template-columns: minmax(0, 1fr); }
   .row, .timeline li, .contact, .facts, .profile dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .contact dt { padding-bottom: 0; border-bottom: 0; }
-  .contact dd { padding-top: 4px; font-size: 15px; }
+  .contact dd { padding-top: 4px; }
   .toc { gap: 16px; }
 }
 </style>
 
 <div class="pf">
   <nav class="toc" aria-label="目次">
-    <a class="brand" href="#home">TAKUMI</a><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+    <a class="brand" href="#home">Takumi</a><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
   </nav>
 
   <header class="hero" id="home">
     <div class="ph hero-img" aria-hidden="true"><span class="ph-tag">仮の画像：キービジュアル</span></div>
     <svg class="hero-ring" viewBox="0 0 1000 1000" aria-hidden="true"><circle cx="500" cy="500" r="490"/><circle cx="540" cy="470" r="330"/></svg>
-    <span class="scroll" aria-hidden="true">SCROLL</span>
+    <span class="scroll" aria-hidden="true">Scroll</span>
     <div class="hero-in">
       <p class="hero-name" aria-label="たくみ">Takumi</p>
-      <p class="hero-role">Ad Operations <i>&amp;</i> Sales — Game</p>
-      <h1>数字で設計し、<em>言葉で</em>動かす。</h1>
+      <p class="hero-role" lang="en">Ad operations and sales for mobile games</p>
+      <h1>数字で設計し、言葉で動かす。</h1>
     </div>
   </header>
 
@@ -261,7 +249,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 
   <div class="group" id="top">
   <section class="intro" aria-label="はじめに">
-    <p class="statement en" lang="en"><span>Design with</span><span><i>numbers,</i></span><span>move with words.</span></p>
+    <p class="statement en" lang="en"><span>Design with</span><span>numbers,</span><span>move with words.</span></p>
     <div class="intro-txt">
       <p class="lead">株式会社アドウェイズで、スマホゲームの広告運用と営業を両方担当しています。日本・北米・中南米・欧州への配信の設計から、クライアントへの説明までを1人でつなぎ、仕事のやり方そのものを仕組みにしています。</p>
       <ul class="chips"><li>運用型広告</li><li>ROAS設計</li><li>グローバル配信</li><li>媒体交渉</li><li>アプリ計測</li><li>複数媒体の運用</li></ul>
@@ -269,42 +257,40 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   </section>
 
   <section class="sec" id="numbers" aria-labelledby="pf-kpi-h">
-    <h3 class="sec-h" id="pf-kpi-h"><span class="en">Numbers</span>数字で見る</h3>
+    <h3 class="sec-h" id="pf-kpi-h">数字で見る</h3>
     <div class="kpis">
       <div class="kpi"><span>担当した広告費</span><b>1,000万〜数億円<small> / 月</small></b><small>リリースの時期などで変わる</small></div>
       <div class="kpi"><span>担当したクライアント</span><b>5<small> 社</small></b><small>国内・海外のゲーム会社</small></div>
       <div class="kpi"><span>配信したエリア</span><b>4<small> 地域</small></b><small>日本・北米・中南米・欧州</small></div>
     </div>
-    <p class="award"><span class="en">Award</span><b>ベストルーキー賞 受賞</b></p>
+    <p class="award"><b>ベストルーキー賞 受賞</b></p>
   </section>
   </div>
 
   <div class="group" id="work">
     <div class="group-h"><h2>Work</h2><p>担当したクライアント・仕事の事例</p></div>
-    <span class="vlabel" aria-hidden="true">Case Studies</span>
   <section class="sec" id="clients">
-    <h3 class="sec-h"><span class="en">Clients</span>担当したクライアント</h3>
+    <h3 class="sec-h">担当したクライアント</h3>
     <ul class="clients">
-      <li><span>Konami</span><b>株式会社コナミデジタルエンタテインメント</b></li>
-      <li><span>Netmarble</span><b>Netmarble Corporation</b></li>
-      <li><span>Bushiroad</span><b>株式会社ブシロード</b></li>
-      <li><span>gumi</span><b>株式会社gumi</b></li>
-      <li><span>Capcom</span><b>株式会社カプコン</b></li>
+      <li><b>株式会社コナミデジタルエンタテインメント</b></li>
+      <li><b>Netmarble Corporation</b></li>
+      <li><b>株式会社ブシロード</b></li>
+      <li><b>株式会社gumi</b></li>
+      <li><b>株式会社カプコン</b></li>
     </ul>
   </section>
 
   <section class="sec" id="cases">
-    <h3 class="sec-h"><span class="en">Cases</span>仕事の事例</h3>
+    <h3 class="sec-h">仕事の事例</h3>
     <p class="sub">課題 → 打ち手 の順に短くまとめています。タイトル名と社外秘の数字は伏せています。詳しくは面接でお話しできます</p>
 
     <article class="case">
       <div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：配信設計のイメージ</span></div>
       <div class="case-top">
-        <div class="case-meta"><span class="num">01</span><span>Global UA</span><span>Card Game</span><span>2025—</span></div>
+        <div class="case-meta"><span class="num">01</span><span>グローバル配信</span><span>カードゲーム</span><span>2025年〜</span></div>
         <div class="case-h">
           <p class="case-en en" lang="en">Quality / Volume</p>
           <h3>グローバル配信のカードゲームで、配信国を「質」と「量」に分けて設計</h3>
-          <p class="outcome">国ごとに役割と評価の物差しを分けた</p>
           <dl class="facts"><dt>領域</dt><dd>スマホゲーム（カードゲーム）・グローバル配信</dd><dt>役割</dt><dd>配信設計・運用・クライアントへの報告</dd><dt>ツール</dt><dd>Google 広告（アプリキャンペーン）</dd></dl>
         </div>
       </div>
@@ -340,11 +326,10 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
     <article class="case">
       <div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：計測のしくみ</span></div>
       <div class="case-top">
-        <div class="case-meta"><span class="num">02</span><span>Measurement</span><span>App</span><span>2025—</span></div>
+        <div class="case-meta"><span class="num">02</span><span>計測</span><span>アプリ</span><span>2025年〜</span></div>
         <div class="case-h">
           <p class="case-en en" lang="en">Measurement Design</p>
           <h3>アプリの新しい施策で、計測の設計からクライアントの理解まで担当</h3>
-          <p class="outcome">計測の設計から、クライアントへの説明まで担当</p>
           <dl class="facts"><dt>領域</dt><dd>スマホゲーム・アプリの計測</dd><dt>役割</dt><dd>計測の設計・クライアントへの説明</dd><dt>ツール</dt><dd>GA4・Firebase・Google 広告</dd></dl>
         </div>
       </div>
@@ -361,11 +346,10 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
     <article class="case">
       <div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：引き継ぎ資料</span></div>
       <div class="case-top">
-        <div class="case-meta"><span class="num">03</span><span>Handover</span><span>Team</span><span>2025—</span></div>
+        <div class="case-meta"><span class="num">03</span><span>引き継ぎ</span><span>チーム</span><span>2025年〜</span></div>
         <div class="case-h">
           <p class="case-en en" lang="en">Handover</p>
           <h3>運用の引き継ぎと後輩の育成</h3>
-          <p class="outcome">結果：引き継ぎを終えて、新しい案件の担当へ</p>
           <dl class="facts"><dt>領域</dt><dd>担当タイトルの運用</dd><dt>役割</dt><dd>後輩1名への引き継ぎ・育成</dd><dt>ツール</dt><dd>Excel（分析の型）・引き継ぎ資料</dd></dl>
         </div>
       </div>
@@ -380,9 +364,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 
   <div class="group" id="about">
     <div class="group-h"><h2>About</h2><p>自己紹介・強みとスキル・経歴・これから</p></div>
-    <span class="vlabel" aria-hidden="true">Profile</span>
   <section class="sec" id="profile" aria-labelledby="pf-about-h">
-    <h3 class="sec-h" id="pf-about-h"><span class="en">Profile</span>自己紹介</h3>
+    <h3 class="sec-h" id="pf-about-h">自己紹介</h3>
     <div class="about">
       <div class="ph portrait"><span class="avatar" aria-hidden="true">た</span><span class="ph-tag">仮：似顔絵</span></div>
       <div class="profile">
@@ -403,21 +386,21 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   </section>
 
   <section class="sec" id="skills">
-    <h3 class="sec-h"><span class="en">Strengths</span>強みとスキル</h3>
+    <h3 class="sec-h">強みとスキル</h3>
     <div class="three">
       <div class="strength"><span class="num en">01</span><h3>上流の設計</h3><p>過去の配信実績から、国やユーザーの質ごとにキャンペーンの組み方を決めます。「何を最大化するか」を先に決めてから手を動かします。</p></div>
       <div class="strength"><span class="num en">02</span><h3>伝わる説明</h3><p>結論から話し、手順を順に伝え、会話で補います。計測の仕組みなど、クライアントが詳しくない領域の説明も担当しています。</p></div>
       <div class="strength"><span class="num en">03</span><h3>仕組み化</h3><p>数字を貼るだけで差分が見える分析シート、ガントチャートでの段取り、言葉にした引き継ぎ資料。人に頼った作業を型にします。</p></div>
     </div>
     <div class="skills">
-      <div><h3>Ad Ops</h3><ul><li>Google 広告（アプリキャンペーン）</li><li>Meta・X・TikTok・Apple Ads</li><li>UNICORN・Zucks などの DSP／アドネットワーク</li><li>ROAS・ARPU を軸にした配信設計</li><li>グローバル・多言語の配信</li></ul></div>
-      <div><h3>Analytics</h3><ul><li>GA4・Firebase 連携</li><li>タグ・トリガーの設計</li><li>Excel での分析の型づくり</li></ul></div>
-      <div><h3>Sales</h3><ul><li>クライアントへの定例報告</li><li>媒体との交渉</li><li>ガントチャートでの段取り</li></ul></div>
+      <div><h3>広告運用</h3><ul><li>Google 広告（アプリキャンペーン）</li><li>Meta・X・TikTok・Apple Ads</li><li>UNICORN・Zucks などの DSP／アドネットワーク</li><li>ROAS・ARPU を軸にした配信設計</li><li>グローバル・多言語の配信</li></ul></div>
+      <div><h3>分析・計測</h3><ul><li>GA4・Firebase 連携</li><li>タグ・トリガーの設計</li><li>Excel での分析の型づくり</li></ul></div>
+      <div><h3>営業</h3><ul><li>クライアントへの定例報告</li><li>媒体との交渉</li><li>ガントチャートでの段取り</li></ul></div>
     </div>
   </section>
 
   <section class="sec" id="career">
-    <h3 class="sec-h"><span class="en">Career</span>経歴</h3>
+    <h3 class="sec-h">経歴</h3>
     <ol class="timeline">
       <li><time>2025.04 —</time><div><h3>株式会社アドウェイズ　ゲームマーケティング部門</h3><p>営業（プランナー／コンサルタント）。法人営業・営業企画・広告戦略の立案と実行。ゲーム会社5社のスマホゲームを担当し、広告運用と営業を兼任。日本・北米・中南米・欧州への配信の設計、クライアント対応、後輩への引き継ぎも担当。ベストルーキー賞を受賞。</p></div></li>
       <li><time>2025.03</time><div><h3>大学卒業</h3><p>卒業後、新卒で現在の会社に入社。</p></div></li>
@@ -425,8 +408,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   </section>
 
   <section class="sec">
-    <h3 class="sec-h"><span class="en">Vision</span>これから</h3>
-    <p class="vision">日本の<b>アニメ・漫画のカルチャーを支える</b>サービスを作りたい。そのために、外から作品を広める「プロモーションの視点」を、いまの仕事で磨いています。</p>
+    <h3 class="sec-h">これから</h3>
+    <p class="vision">日本のアニメ・漫画のカルチャーを支えるサービスを作りたい。そのために、外から作品を広める「プロモーションの視点」を、いまの仕事で磨いています。</p>
   </section>
   </div>
 
@@ -434,13 +417,13 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
     <div class="group-h"><h2>Contact</h2><p>選考・面談のご連絡はこちらへ</p></div>
   <section class="sec">
     <dl class="contact">
-      <dt>Mail</dt><dd>huyejiang1@gmail.com</dd>
-      <dt>Base</dt><dd>東京</dd>
+      <dt>メール</dt><dd>huyejiang1@gmail.com</dd>
+      <dt>拠点</dt><dd>東京</dd>
     </dl>
   </section>
   </div>
 
-  <p class="foot"><span>担当タイトル名と社外秘の数字は伏せています</span><span class="en">TAKUMI — PORTFOLIO © 2026</span></p>
+  <p class="foot"><span>担当タイトル名と社外秘の数字は伏せています</span><span class="en">© 2026 Takumi</span></p>
 </div>
 </div>
 
@@ -467,7 +450,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .st-open svg { position: absolute; width: min(70vmin, 520px); height: auto; }
 .st-open circle { fill: none; stroke: rgba(243, 243, 240, .35); stroke-width: 1; stroke-dasharray: 1600; stroke-dashoffset: 1600;
   animation: st-draw 1.4s cubic-bezier(.6, 0, .2, 1) forwards; }
-.st-open p { position: relative; color: rgba(243, 243, 240, .8); font: 300 15px/1 var(--serif); letter-spacing: .4em; opacity: 0; animation: st-in .8s ease .35s forwards; }
+.st-open p { position: relative; color: rgba(243, 243, 240, .8); font: 300 18px/1 var(--serif); letter-spacing: .2em; opacity: 0; animation: st-in .8s ease .35s forwards; }
 @keyframes st-draw { to { stroke-dashoffset: 0; } }
 @keyframes st-in { to { opacity: 1; } }
 @keyframes st-fade { to { opacity: 0; visibility: hidden; } }
@@ -504,7 +487,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 </div>
 <div class="st-open" aria-hidden="true">
   <svg viewBox="0 0 520 520"><circle cx="260" cy="260" r="250"/></svg>
-  <p>TAKUMI — PORTFOLIO</p>
+  <p>Takumi</p>
 </div>
 
 <script>
