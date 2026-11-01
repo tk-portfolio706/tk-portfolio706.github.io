@@ -8,21 +8,22 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap">
 <style>body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }</style>
 </head>
 <body>
 <style>
 /* ポートフォリオの中身。単体ページ（:root）とマイツールの囲い（:host）の両方で使う。build.py が両方に差し込む */
 /* 2026-11-01 見直し：アートディレクターのポートフォリオを参考に「雑誌のような」見た目へ。白い地・細いセリフ体の大きな英字・画像が先・番号つきの事例 */
-/* 本文は Noto Sans JP のまま読みやすく。英字の見出しだけ Cormorant Garamond。差し色は群青1色。幅は画面いっぱい（2026-11-01 たくみ）。左右の余白は画面の幅に合わせて 16〜64px、文の行だけ 46em までに抑える */
+/* 書体：英字の見出しは Cormorant Garamond、日本語の見出しとキャッチは明朝（Shippori Mincho）、本文は細いゴシック（Zen Kaku Gothic New）。2026-11-01 たくみが3案から C を選んだ。差し色は群青1色。幅は画面いっぱい（2026-11-01 たくみ）。左右の余白は画面の幅に合わせて 16〜64px、文の行だけ 46em までに抑える */
 /* :not(#_) は、マイツール側の明暗の指定より強くするための書き方（このページはいつも白） */
 :root:not(#_), :host(:not(#_)) {
   --bg: #f6f6f3; --surface: #ffffff; --sunken: #ecece8; --ink: #141517; --muted: #686c73; --line: #d8d8d2;
   --accent: #2e45a3; --on-accent: #ffffff; --accent-soft: #e5e9f7;
   --warn: #b2470e; --warn-soft: #fbe9de;
   --ph: #d9d9d4; --ph-2: #e9e9e5; --night: #1d1f23;
-  --font: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --font: "Zen Kaku Gothic New", "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --mincho: "Shippori Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif;
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --gut: max(clamp(16px, 4vw, 64px), env(safe-area-inset-left, 0px));
   color-scheme: light;
@@ -30,7 +31,7 @@
 :host { display: block; }
 body { background: var(--bg); }
 .pf, .pf * { box-sizing: border-box; }
-.pf { min-height: 100vh; background: var(--bg); color: var(--ink); font: 14px/1.9 var(--font);
+.pf { min-height: 100vh; background: var(--bg); color: var(--ink); font: 14px/1.9 var(--font); letter-spacing: .03em;
   padding-inline: var(--gut); overflow-x: clip; }
 .pf h1, .pf h2, .pf h3, .pf p { margin: 0; }
 .pf h1, .pf h2, .pf h3 { line-height: 1.4; text-wrap: balance; }
@@ -39,6 +40,8 @@ body { background: var(--bg); }
 .pf-in { margin: 0 auto; padding-block: 48px 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 120px; }
 .pf-in > * { min-width: 0; }
 .en { font-family: var(--serif); font-weight: 300; letter-spacing: .02em; }
+/* 日本語の見出しとキャッチは明朝。英字と同じ「はね・はらい」でそろえる */
+.hero h1, .sec-h, .case-h h3, .work-h h3, .story h3, .strength h3, .timeline h3, .vision, .profile-name span { font-family: var(--mincho); font-weight: 500; letter-spacing: .06em; }
 
 /* 記入待ち：色と言葉の両方で出す */
 .todo { background: var(--warn-soft); color: var(--warn); border-radius: 4px; padding: 0 4px; font: 500 13px/1.6 var(--font); letter-spacing: 0; }
@@ -76,7 +79,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .hero-name { font: 300 clamp(72px, 15vw, 232px)/.86 var(--serif); letter-spacing: .01em; margin-left: -.04em; }
 .hero-role { font: 300 clamp(18px, 2.2vw, 28px)/1.3 var(--serif); letter-spacing: .14em; text-transform: uppercase; color: rgba(243, 243, 240, .78); }
 .hero-role i { font-style: italic; text-transform: none; }
-.hero h1 { font-size: clamp(20px, 2.4vw, 30px); font-weight: 400; letter-spacing: .08em; }
+.hero h1 { font-size: clamp(20px, 2.4vw, 30px); font-weight: 400; letter-spacing: .12em; }
 .hero h1 em { font-style: normal; border-bottom: 1px solid currentColor; }
 .scroll { position: absolute; right: var(--gut); bottom: clamp(40px, 8vh, 96px); writing-mode: vertical-rl; font: 400 11px/1 var(--serif); letter-spacing: .4em; color: rgba(243, 243, 240, .7); display: flex; align-items: center; gap: 12px; }
 .scroll::after { content: ""; width: 1px; height: 56px; background: currentColor; }
