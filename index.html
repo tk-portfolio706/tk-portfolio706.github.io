@@ -429,7 +429,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 
 <style>
 /* ポートフォリオの動き（build.py が見せる用とマイツールの両方に、content.html のあとに足す） */
-/* 方向：白い静かな地に、細い線の円がゆっくり回る。最初に短い幕開け、名前は1文字ずつ、スクロールで画像が上から現れ、文が浮かぶ */
+/* 方向：白い静かな地に、細い線の円がゆっくり回る（スクロールしても回る）。最初に短い幕開け、名前は1文字ずつ、スクロールで画像が上から現れ、文が浮かぶ */
 /* 線は形を変えずに回る・現れるだけ（揺れる線は使わない：2026-11-01 たくみ） */
 .pf { position: relative; z-index: 1; background: transparent; }
 
@@ -441,6 +441,10 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .st-spin, .hero-ring circle { transform-origin: 500px 500px; animation: st-spin 140s linear infinite; }
 .st-spin.rev, .hero-ring circle + circle { animation-duration: 200s; animation-direction: reverse; }
 @keyframes st-spin { to { transform: rotate(360deg); } }
+/* スクロールでも回る（2026-11-01 たくみ「案A」。参考：jiii-atelier.com の、スクロールに合わせて動く背景）。
+   --sy は上から何画面分スクロールしたか、--p はページのどこまで来たか（0〜1）。script が書き込む。時間で回る動きの外側に重ねる */
+.st-big { transform-origin: 500px 500px; transform: rotate(calc(var(--sy, 0) * 45deg)) scale(calc(1 + var(--p, 0) * .15)); }
+.st-small { transform: translate(calc(var(--p, 0) * -300px), calc(var(--p, 0) * 240px)); }
 .hero-ring circle { stroke-dasharray: 2 6; }
 .hero-ring circle + circle { stroke-dasharray: none; }
 
@@ -481,8 +485,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 
 <div class="st-bg" aria-hidden="true">
   <svg viewBox="0 0 1000 1000">
-    <g class="st-spin"><circle cx="500" cy="500" r="430"/><polygon points="500,90 855,295 855,705 500,910 145,705 145,295"/></g>
-    <g class="st-spin rev"><circle cx="560" cy="470" r="300"/></g>
+    <g class="st-big"><g class="st-spin"><circle cx="500" cy="500" r="430"/><polygon points="500,90 855,295 855,705 500,910 145,705 145,295"/></g></g>
+    <g class="st-small"><g class="st-spin rev"><circle cx="560" cy="470" r="300"/></g></g>
   </svg>
 </div>
 <div class="st-open" aria-hidden="true">
@@ -503,6 +507,20 @@ window.pfStage = function (root) {
     name.textContent = "";
     [...t].forEach((c, i) => { const s = document.createElement("span"); s.className = "st-ch"; s.textContent = c; s.style.transitionDelay = (i * 70) + "ms"; name.appendChild(s); });
     hero?.classList.add("st-wait");
+  }
+  // 背景の円をスクロールに合わせて回す。少し遅れて追いかけるので、指で速く動かしても背景が跳ねない（動きを減らす設定の人には付けない）
+  if (!still) {
+    const page = document.documentElement, bg = root.querySelector(".st-bg");
+    let sy = 0, p = 0, raf = 0;
+    const tick = () => {
+      const max = Math.max(1, page.scrollHeight - innerHeight);
+      const tsy = scrollY / innerHeight, tp = Math.min(1, scrollY / max);
+      sy += (tsy - sy) * .1; p += (tp - p) * .1;
+      bg?.style.setProperty("--sy", sy.toFixed(4)); bg?.style.setProperty("--p", p.toFixed(4));
+      raf = Math.abs(tsy - sy) > .001 || Math.abs(tp - p) > .0005 ? requestAnimationFrame(tick) : 0;
+    };
+    addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+    tick();
   }
   // 幕開けは1回だけ。消え始めたら名前とスクロールの動きを始める（このとき初めて画面に出ている）
   if (!open || still) { open?.remove(); start(); return; }
