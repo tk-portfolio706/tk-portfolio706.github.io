@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>たくみ ポートフォリオ</title>
+<meta name="description" content="ゲーム広告の運用と営業。数字で設計し、言葉で動かす。">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }</style>
+</head>
+<body>
+<style>
+/* ポートフォリオの中身。単体ページ（:root）とマイツールの囲い（:host）の両方で使う。build.py が両方に差し込む */
+/* 色・文字・角はデザインシステム「マイツール」のまま。アクセントは群青1色。幅はほかのツールと同じ最大 1360px。文の行は 46em までに抑える */
+:root, :host {
+  --bg: #f3f4f5; --surface: #ffffff; --sunken: #e8eaed; --ink: #1b1e22; --muted: #5d636c; --line: #dadde2;
+  --accent: #2e45a3; --on-accent: #ffffff; --accent-soft: #e5e9f7; --accent-mark: #4a5fb8;
+  --warn: #b2470e; --warn-soft: #fbe9de; --shadow: 0 1px 2px rgba(20, 30, 60, .07);
+  --font: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]), :host(:not([data-theme="light"])) {
+    --bg: #141619; --surface: #1f2226; --sunken: #1a1c20; --ink: #e9ebee; --muted: #9ba1aa; --line: #33373e;
+    --accent: #97a9ee; --on-accent: #0d1424; --accent-soft: #1f2a52; --accent-mark: #8095e6;
+    --warn: #f29a64; --warn-soft: #3d2618; --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"], :host([data-theme="dark"]) {
+  --bg: #141619; --surface: #1f2226; --sunken: #1a1c20; --ink: #e9ebee; --muted: #9ba1aa; --line: #33373e;
+  --accent: #97a9ee; --on-accent: #0d1424; --accent-soft: #1f2a52; --accent-mark: #8095e6;
+  --warn: #f29a64; --warn-soft: #3d2618; --shadow: none; color-scheme: dark;
+}
+:host { display: block; }
+body { background: var(--bg); }
+.pf, .pf * { box-sizing: border-box; }
+.pf { min-height: 100vh; background: var(--bg); color: var(--ink); font: 14px/1.8 var(--font);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); overflow-x: clip; }
+.pf h1, .pf h2, .pf h3, .pf p { margin: 0; }
+.pf h1, .pf h2, .pf h3 { line-height: 1.4; text-wrap: balance; }
+.pf a { color: var(--accent); }
+.pf :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pf-in { max-width: 1360px; margin: 0 auto; padding-block: 24px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.pf-in > * { min-width: 0; }
+
+/* 記入待ち：色と言葉の両方で出す */
+.todo { background: var(--warn-soft); color: var(--warn); border-radius: 4px; padding: 0 4px; font-size: 13px; font-weight: 500; }
+.note { font-size: 12px; color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 6px 12px; justify-self: start; }
+
+/* はじめ */
+.hero { display: grid; gap: 12px; padding-block: 8px; }
+.hero .who { font-size: 13px; color: var(--muted); font-weight: 500; }
+.hero h1 { font-size: 34px; font-weight: 700; letter-spacing: .01em; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero .lead { font-size: 15px; color: var(--muted); max-width: 36em; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 13px; padding: 4px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+
+/* まとまり */
+.sec { display: grid; gap: 12px; }
+.sec > .sub { font-size: 13px; color: var(--muted); margin-top: -8px; }
+/* 4つのまとまり（Home・Work・About・Contact）。まとまりの名前は title、中の見出しは heading */
+.group { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; scroll-margin-top: calc(var(--toc-top, 0px) + 48px); }
+.group + .group { border-top: 1px solid var(--line); padding-top: 32px; }
+.group-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.group-h h2 { font-size: 19px; font-weight: 700; letter-spacing: .02em; }
+.group-h p { font-size: 13px; color: var(--muted); }
+.sec-h { font-size: 15px; font-weight: 700; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); min-width: 0; }
+.pad { padding: 16px; }
+
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.three .card { display: grid; gap: 4px; align-content: start; }
+.three h3 { font-size: 15px; }
+.three p { font-size: 13px; color: var(--muted); }
+
+/* 自己紹介：左に人となりの要点、右に「いま・理由・大事にしていること」 */
+.about { display: grid; grid-template-columns: 200px minmax(0, 1fr); }
+.profile { padding: 16px; display: grid; gap: 8px; align-content: start; border-right: 1px solid var(--line); }
+.avatar { width: 56px; height: 56px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 19px; font-weight: 700; }
+img.avatar { width: 96px; height: 96px; object-fit: cover; border: 1px solid var(--line); }
+.profile > b { font-size: 15px; }
+.profile dl { margin: 0; display: grid; gap: 4px; }
+.profile dt { font-size: 11px; color: var(--muted); }
+.profile dd { margin: 0 0 4px; font-size: 13px; }
+.story { padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 24px; }
+.story h3 { font-size: 15px; margin-bottom: 4px; }
+.story p { font-size: 14px; }
+
+/* 数字で見る：30秒で読む人のために、事例より先に数字を出す */
+.kpis .card { display: grid; gap: 2px; align-content: start; }
+.kpis span:first-child { font-size: 12px; color: var(--muted); }
+.kpis b { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpis b .todo { font-size: 15px; }
+.kpis small { font-size: 12px; color: var(--muted); }
+
+/* 事例：見出しのすぐ下に結果を1行。中は 課題 → 打ち手 → 結果 */
+.case-h { padding: 16px; display: grid; gap: 4px; border-bottom: 1px solid var(--line); }
+.case-h h3 { font-size: 15px; }
+.case-h .outcome { font-size: 13px; font-weight: 700; color: var(--accent); }
+/* 案件の基本情報（doda・リクルートエージェントが挙げる、期間・体制・役割・ツール） */
+.facts { margin: 4px 0 0; display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 2px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); font-size: 12px; padding-top: 1px; }
+.facts dd { margin: 0; }
+
+/* 目次：スクロールしても上に貼り付く。マイツールの中ではスマホの上のバー（48px）の下に付く（--toc-top） */
+.toc { position: sticky; top: var(--toc-top, env(safe-area-inset-top, 0px)); z-index: 5; background: var(--bg);
+  display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; white-space: nowrap;
+  font-size: 13px; padding-block: 8px; border-bottom: 1px solid var(--line); }
+.toc::-webkit-scrollbar { display: none; }
+.toc a { text-decoration: none; padding-block: 4px; flex: none; }
+.toc a:hover { text-decoration: underline; }
+.sec { scroll-margin-top: calc(var(--toc-top, 0px) + 56px); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.row p, .row ul, .sec > .sub { max-width: 46em; }
+.row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); }
+.case-h + .row { border-top: 0; }
+.row .k { font-size: 12px; font-weight: 700; color: var(--muted); padding-top: 3px; }
+.row.result .k { color: var(--accent); }
+.row ul { margin: 0; padding-left: 1.2em; }
+
+/* 配信設計の図 */
+.diagram { padding: 4px 16px 16px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; max-width: 760px; min-width: 520px; height: auto; }
+.diagram text { font-family: var(--font); fill: var(--ink); }
+.diagram .s { fill: var(--muted); font-size: 11px; }
+
+/* 作ったもの */
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.two .card { display: grid; gap: 4px; align-content: start; }
+.two h3 { font-size: 15px; }
+.two p { font-size: 13px; color: var(--muted); }
+.nums { font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 4px; }
+
+.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.skills h3 { font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+.skills ul { margin: 0; padding-left: 1.2em; }
+
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); }
+.timeline li:first-child { border-top: 0; }
+.timeline time { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.timeline h3 { font-size: 14px; }
+.timeline p { font-size: 13px; color: var(--muted); }
+
+.vision { background: var(--accent-soft); border-radius: 8px; padding: 16px; font-size: 15px; font-weight: 700; line-height: 1.8; }
+.vision b { color: var(--accent); }
+.contact { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 12px; margin: 0; }
+.contact dt { font-size: 13px; color: var(--muted); }
+.contact dd { margin: 0; }
+.foot { font-size: 12px; color: var(--muted); }
+
+@media (max-width: 899px) {
+  .pf-in { padding-block: 12px 40px; }
+  .hero h1 { font-size: 34px; }
+  .three, .two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .about { grid-template-columns: minmax(0, 1fr); }
+  .profile { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 520px) {
+  .skills { grid-template-columns: minmax(0, 1fr); }
+  .row, .timeline li, .contact { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+</style>
+
+<div class="pf">
+<div class="pf-in">
+
+  <nav class="toc" aria-label="目次">
+    <a href="#home">Home</a><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+  </nav>
+
+  <div class="group" id="home">
+  <header class="hero">
+    <span class="who">たくみ　ゲーム広告の運用・営業</span>
+    <h1>数字で設計し、<em>言葉で</em>動かす。</h1>
+    <p class="lead">広告代理店で、スマホゲームの広告運用と営業を両方担当しています。配信の設計からクライアントへの説明までを1人でつなぎ、仕事のやり方そのものを仕組みにして、AIで道具を作っています。</p>
+    <div class="chips"><span class="chip">運用型広告</span><span class="chip">ROAS設計</span><span class="chip">グローバル配信</span><span class="chip">媒体交渉</span><span class="chip">アプリ計測</span><span class="chip">AI活用</span></div>
+  </header>
+
+  <section class="sec" id="numbers" aria-labelledby="pf-kpi-h">
+    <h3 class="sec-h" id="pf-kpi-h">数字で見る</h3>
+    <div class="three kpis">
+      <div class="card pad"><span>ROAS の改善</span><b><span class="todo">【○% → ○%】</span></b><small>配信国を質と量に分けた設計で</small></div>
+      <div class="card pad"><span>担当した広告費</span><b><span class="todo">【月 ○万円】</span></b><small>スマホゲーム <span class="todo">【○】</span>タイトル</small></div>
+      <div class="card pad"><span>配信した国</span><b><span class="todo">【○か国】</span></b><small>多言語のクリエイティブを管理</small></div>
+    </div>
+  </section>
+  </div>
+
+  <div class="group" id="work">
+    <div class="group-h"><h2>Work</h2><p>仕事の事例・AIで作ったもの</p></div>
+  <section class="sec" id="cases">
+    <h3 class="sec-h">仕事の事例</h3>
+    <p class="sub">課題 → 打ち手 → 結果 の順に書いています。クライアント名と社外秘の数字は伏せ、割合で示しています。詳しい資料は面接でお見せできます</p>
+
+    <article class="card">
+      <div class="case-h">
+        <h3>グローバル配信のカードゲームで、配信国を「質」と「量」に分けて設計</h3>
+        <p class="outcome">結果：ROAS <span class="todo">【○%→○%】</span></p>
+        <dl class="facts"><dt>領域</dt><dd>スマホゲーム（カードゲーム）・グローバル配信</dd><dt>期間</dt><dd><span class="todo">【20XX年○月〜○か月】</span></dd><dt>体制・役割</dt><dd><span class="todo">【○名のチームで】</span>配信設計・運用・クライアントへの報告</dd><dt>ツール</dt><dd>Google 広告（アプリキャンペーン）</dd></dl>
+      </div>
+      <div class="row"><span class="k">課題</span><p>課金するユーザーを取りたい国と、インストール数を伸ばしたい国が、同じ組み方で配信されていた。国ごとに役割が違うのに、評価の物差しが1つだった。</p></div>
+      <div class="row"><span class="k">打ち手</span><ul>
+        <li>過去の配信実績から、ARPU（1人あたりの課金額）が高い国と、母数が取れる国を分けた</li>
+        <li>質の国（北米など）は課金を最適化するキャンペーンで切り出し、ROASで評価</li>
+        <li>その他の国は1つのキャンペーンにまとめ、中南米などで量を取る役割に</li>
+      </ul></div>
+      <div class="diagram" role="img" aria-label="配信国を質と量の2つに分けたキャンペーン構成の図">
+        <svg viewBox="0 0 640 210">
+          <rect x="8" y="80" width="150" height="50" rx="6" fill="var(--sunken)" stroke="var(--line)"/>
+          <text x="83" y="102" text-anchor="middle" font-size="13" font-weight="700">過去の配信実績</text>
+          <text x="83" y="120" text-anchor="middle" class="s">国別 ARPU・獲得数</text>
+          <path d="M158 105 H210 M210 50 V160 M210 50 H250 M210 160 H250" fill="none" stroke="var(--muted)"/>
+          <rect x="250" y="20" width="200" height="62" rx="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+          <text x="266" y="44" font-size="13" font-weight="700">質のキャンペーン</text>
+          <text x="266" y="64" class="s">北米など ARPU が高い国</text>
+          <rect x="250" y="128" width="200" height="62" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="266" y="152" font-size="13" font-weight="700">量のキャンペーン</text>
+          <text x="266" y="172" class="s">その他の国を1つにまとめる</text>
+          <path d="M450 51 H490 M450 159 H490" fill="none" stroke="var(--line)" stroke-dasharray="3 3"/>
+          <text x="498" y="47" font-size="12" font-weight="700">最適化：課金</text>
+          <text x="498" y="64" class="s">評価：ROAS</text>
+          <text x="498" y="155" font-size="12" font-weight="700">最適化：インストール</text>
+          <text x="498" y="172" class="s">評価：獲得数・単価</text>
+        </svg>
+      </div>
+      <div class="row result"><span class="k">結果</span><p>ROAS <span class="todo">【○%→○%】</span>、獲得数 <span class="todo">【○件／月】</span>。<span class="todo">【予算や評価への影響があれば】</span></p></div>
+    </article>
+
+    <article class="card">
+      <div class="case-h">
+        <h3>アプリの新しい施策で、計測の設計からクライアントの理解まで担当</h3>
+        <p class="outcome">結果：<span class="todo">【計測できるようになったこと】</span></p>
+        <dl class="facts"><dt>領域</dt><dd>スマホゲーム・アプリの計測</dd><dt>期間</dt><dd><span class="todo">【20XX年○月〜○か月】</span></dd><dt>体制・役割</dt><dd><span class="todo">【○名のチームで】</span>計測の設計・クライアントへの説明</dd><dt>ツール</dt><dd>GA4・Firebase・Google 広告</dd></dl>
+      </div>
+      <div class="row"><span class="k">課題</span><p>新しく始めるアプリキャンペーンで、Web側とアプリ側の計測をつなぐ必要があった。クライアント側にも計測の仕組みに詳しい人が少なかった。</p></div>
+      <div class="row"><span class="k">打ち手</span><ul>
+        <li>計測の設計、タグの作成、発火のきっかけ（トリガー）との紐づけを整理</li>
+        <li>GA4 と Google 広告を Firebase で連携する流れを図にして、クライアントに説明</li>
+        <li>定例資料への指摘を受けて、報告の形を見直した</li>
+      </ul></div>
+      <div class="row result"><span class="k">結果</span><p><span class="todo">【計測が正しく取れるようになった範囲・施策の成果】</span></p></div>
+    </article>
+
+    <article class="card">
+      <div class="case-h">
+        <h3>運用の引き継ぎと後輩の育成</h3>
+        <p class="outcome">結果：引き継ぎを終えて、新しい案件の担当へ</p>
+        <dl class="facts"><dt>領域</dt><dd>担当タイトルの運用</dd><dt>期間</dt><dd><span class="todo">【○か月】</span></dd><dt>体制・役割</dt><dd>後輩1名への引き継ぎ・育成を担当</dd><dt>ツール</dt><dd>Excel（分析の型）・引き継ぎ資料</dd></dl>
+      </div>
+      <div class="row"><span class="k">課題</span><p>担当していたタイトルの運用を後輩に渡すことになった。判断の多くが自分の頭の中にあった。</p></div>
+      <div class="row"><span class="k">打ち手</span><p>なぜその設定にしているのかを言葉にして渡し、分析の型（数字を貼ると差分と進み具合が見えるシート）も一緒に引き継いだ。</p></div>
+      <div class="row result"><span class="k">結果</span><p>引き継ぎは順調に進み、自分は新しい案件に移れた。<span class="todo">【引き継ぎ後の成果・期間】</span></p></div>
+    </article>
+  </section>
+
+  <section class="sec" id="works">
+    <h3 class="sec-h">AIで作ったもの</h3>
+    <p class="sub">会社では調べ物・資料のHTML化・軽いツール作りに Claude Code を使っています。個人では暮らしと仕事の道具を作っています</p>
+    <div class="two">
+      <div class="card pad"><h3>へやマッチ</h3><p>引っ越し先の候補を、写真を見て「アリ・ナシ・本命」にスワイプで振り分けるアプリ。2年間の実質コストと通勤時間を自動で計算し、比較表で裏付けます。</p><span class="nums">候補 70件 / 写真 413枚 / 改良 26回</span></div>
+      <div class="card pad"><h3>マイツール</h3><p>家計簿とタスク管理を1つのページにまとめた自分用の道具。スマホとPCのどちらでも使え、色や部品の決まり（デザインシステム）も自分で作りました。</p><span class="nums">家計簿 + タスク管理 / スマホ・PC 両対応</span></div>
+      <div class="card pad"><h3>第二の脳</h3><p>メモ・日記・調べたことを1か所にためて、AI が毎朝「今日やる3つ」を出し、毎晩日報の下書きを作る仕組み。週1回、改善点を自分で見つけて回します。</p><span class="nums">自動実行 5本（朝・夜・週次）</span></div>
+      <div class="card pad"><h3>作る前に調べる</h3><p>作る前に、似たオープンソースを2〜3件比べて、良い作り方を選んでから作ります。入れるソフトは安全かどうかを毎回確かめます。</p><span class="nums">デモは面接でお見せできます</span></div>
+    </div>
+  </section>
+  </div>
+
+  <div class="group" id="about">
+    <div class="group-h"><h2>About</h2><p>自己紹介・強みとスキル・経歴・これから</p></div>
+  <section class="sec" id="profile" aria-labelledby="pf-about-h">
+    <h3 class="sec-h" id="pf-about-h">自己紹介</h3>
+    <div class="card about">
+      <div class="profile">
+        <span class="avatar" aria-hidden="true">た</span>
+        <b>たくみ</b>
+        <dl>
+          <dt>仕事</dt><dd>広告代理店　ゲームの広告運用・営業</dd>
+          <dt>経験</dt><dd>広告運用・営業 <span class="todo">【○年】</span></dd>
+          <dt>拠点</dt><dd><span class="todo">【東京など】</span></dd>
+          <dt>好きなもの</dt><dd>アニメ・漫画、絵を描くこと</dd>
+        </dl>
+      </div>
+      <div class="story">
+        <div><h3>いま</h3><p>スマホゲームの広告で、配信の設計・運用と、クライアントへの提案・報告を1人で受け持っています。数字を見て組み方を決め、それを相手にわかる言葉で説明するのが、いちばん得意な仕事です。</p></div>
+        <div><h3>広告の仕事を選んだ理由</h3><p>アニメや漫画を、作る側ではなく「外から広める側」から見たかったからです。作品がどう見つけられ、どう遊ばれ、どう課金されるのかを、数字で追える場所として広告代理店を選びました。<span class="todo">【新卒・前職からの流れを1文】</span></p></div>
+        <div><h3>大事にしていること</h3><p>あいまいな言い方をせず、言い切ること。うまい人のやり方をまず真似して、自分の型にすること。一度やったことは、次の人が使える形に残すこと。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="skills">
+    <h3 class="sec-h">強みとスキル</h3>
+    <div class="three">
+      <div class="card pad"><h3>上流の設計</h3><p>過去の配信実績から、国やユーザーの質ごとにキャンペーンの組み方を決めます。「何を最大化するか」を先に決めてから手を動かします。</p></div>
+      <div class="card pad"><h3>伝わる説明</h3><p>結論から話し、手順を順に伝え、会話で補います。計測の仕組みなど、クライアントが詳しくない領域の説明も担当しています。</p></div>
+      <div class="card pad"><h3>仕組み化</h3><p>数字を貼るだけで差分が見える分析シート、ガントチャートでの段取り、言葉にした引き継ぎ資料。人に頼った作業を型にします。</p></div>
+    </div>
+    <div class="card pad skills">
+      <div><h3>広告運用</h3><ul><li>Google 広告（アプリキャンペーン）</li><li>ROAS・ARPU を軸にした配信設計</li><li>グローバル・多言語の配信</li><li><span class="todo">【ほかの媒体】</span></li></ul></div>
+      <div><h3>計測・分析</h3><ul><li>GA4・Firebase 連携</li><li>タグ・トリガーの設計</li><li>Excel での分析の型づくり</li></ul></div>
+      <div><h3>営業・進行</h3><ul><li>クライアントへの定例報告</li><li>媒体との交渉</li><li>ガントチャートでの段取り</li></ul></div>
+      <div><h3>AI・制作</h3><ul><li>Claude Code でのツール作り</li><li>資料の HTML 化</li><li>画像生成（ComfyUI）</li></ul></div>
+    </div>
+  </section>
+
+  <section class="sec" id="career">
+    <h3 class="sec-h">経歴</h3>
+    <ol class="card timeline">
+      <li><time><span class="todo">【20XX】</span>〜</time><div><h3>広告代理店　ゲーム領域の営業・運用</h3><p>スマホゲームの広告運用と営業を兼任。グローバル配信の設計、クライアント対応、後輩への引き継ぎ。</p></div></li>
+      <li><time><span class="todo">【20XX】</span></time><div><h3><span class="todo">【前職・入社の経緯】</span></h3><p><span class="todo">【1行で】</span></p></div></li>
+    </ol>
+  </section>
+
+  <section class="sec">
+    <h3 class="sec-h">これから</h3>
+    <p class="vision">日本の<b>アニメ・漫画のカルチャーを支える</b>サービスを作りたい。そのために、外から作品を広める「プロモーションの視点」を、いまの仕事で磨いています。</p>
+  </section>
+  </div>
+
+  <div class="group" id="contact">
+    <div class="group-h"><h2>Contact</h2><p>選考・面談のご連絡はこちらへ</p></div>
+  <section class="sec">
+    <dl class="card pad contact">
+      <dt>メール</dt><dd><span class="todo">【転職用のアドレス】</span></dd>
+      <dt>LinkedIn など</dt><dd><span class="todo">【URL】</span></dd>
+    </dl>
+  </section>
+  </div>
+
+  <p class="foot">担当タイトル名・クライアント名は伏せています</p>
+</div>
+</div>
+
+<style>
+/* ポートフォリオの見た目と動き（build.py が見せる用とマイツールの両方に、content.html のあとに足す） */
+/* 方向：白い静かな地に、細い線の円がゆっくり回る。最初に短い幕開け、スクロールで静かに浮かび上がる。いつも白（2026-11-01 暗い地から変更） */
+/* :not(#_) は、content.html のライト・ダークの指定より強くするための書き方。:host はマイツールの囲いの中 */
+:root:not(#_), :host(:not(#_)) {
+  --bg: #f8f8f6; --surface: #ffffff; --sunken: #f0f0ed; --ink: #1b1e22; --muted: #5d636c; --line: #e3e3df;
+  --accent: #2e45a3; --on-accent: #ffffff; --accent-soft: #e5e9f7; --accent-mark: #4a5fb8;
+  --warn: #b2470e; --warn-soft: #fbe9de; --shadow: none; color-scheme: light;
+  --stroke: rgba(27, 30, 34, .09);
+}
+body { background: var(--bg); }
+.pf { position: relative; z-index: 1; background: transparent; }
+.card { background: color-mix(in srgb, var(--surface) 88%, transparent); transition: border-color .4s ease; }
+.card:hover { border-color: #b9bcc2; }
+.hero { padding-block: 48px 24px; }
+.hero h1 { font-weight: 400; letter-spacing: .04em; line-height: 1.3; }
+.hero h1 em { color: var(--ink); border-bottom: 1px solid var(--accent); }
+.group-h h2 { font-weight: 400; font-size: 34px; letter-spacing: .12em; }
+.toc { background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(6px); }
+.toc a { color: var(--muted); letter-spacing: .08em; transition: color .3s; }
+.toc a:hover { color: var(--ink); text-decoration: none; }
+
+/* 後ろの線：大きな円が2つ、ゆっくり回る。マイツールではサイドパネル（--side-w）と上のバー（--toc-top）を避ける */
+.st-bg, .st-open { left: var(--side-w, 0px); top: var(--toc-top, 0px); }
+.st-bg { position: fixed; right: 0; bottom: 0; z-index: 0; pointer-events: none; overflow: hidden; background: var(--bg); }
+.st-bg svg { position: absolute; width: min(120vmax, 1600px); height: auto; left: 50%; top: 50%; translate: -50% -50%; }
+.st-bg circle, .st-bg polygon { fill: none; stroke: var(--stroke); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.st-spin { transform-origin: 500px 500px; animation: st-spin 140s linear infinite; }
+.st-spin.rev { animation-duration: 200s; animation-direction: reverse; }
+@keyframes st-spin { to { transform: rotate(360deg); } }
+
+/* 幕開け：線の円が描かれて、一言が出て、消える（1.8秒） */
+.st-open { position: fixed; right: 0; bottom: 0; z-index: 50; display: grid; place-items: center; background: var(--bg);
+  animation: st-fade .7s ease 1.3s forwards; }
+.st-open svg { position: absolute; width: min(70vmin, 520px); height: auto; }
+.st-open circle { fill: none; stroke: rgba(27, 30, 34, .3); stroke-width: 1; stroke-dasharray: 1600; stroke-dashoffset: 1600;
+  animation: st-draw 1.4s cubic-bezier(.6, 0, .2, 1) forwards; }
+.st-open p { position: relative; color: var(--muted); font-size: 13px; letter-spacing: .3em; opacity: 0; animation: st-in .8s ease .35s forwards; }
+@keyframes st-draw { to { stroke-dashoffset: 0; } }
+@keyframes st-in { to { opacity: 1; } }
+@keyframes st-fade { to { opacity: 0; visibility: hidden; } }
+
+/* 見出しの1文字ずつ（幕開けのあとに出る） */
+.st-ch { display: inline-block; opacity: .08; translate: 0 .25em; transition: opacity .9s ease, translate .9s ease; }
+.st-on .st-ch { opacity: 1; translate: 0 0; }
+
+/* スクロールで浮かび上がる：止まった状態でも読める濃さから始める */
+.st-rise { opacity: .35; translate: 0 24px; filter: blur(3px); transition: opacity 1s ease, translate 1s ease, filter 1s ease; }
+.st-rise.st-up { opacity: 1; translate: 0 0; filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .st-open { display: none; }
+  .st-spin, .st-spin.rev { animation: none; }
+  .st-ch, .st-rise { opacity: 1; translate: none; filter: none; transition: none; }
+}
+</style>
+
+<div class="st-bg" aria-hidden="true">
+  <svg viewBox="0 0 1000 1000">
+    <g class="st-spin"><circle cx="500" cy="500" r="430"/><polygon points="500,90 855,295 855,705 500,910 145,705 145,295"/></g>
+    <g class="st-spin rev"><circle cx="560" cy="470" r="300"/></g>
+  </svg>
+</div>
+<div class="st-open" aria-hidden="true">
+  <svg viewBox="0 0 520 520"><circle cx="260" cy="260" r="250"/></svg>
+  <p>TAKUMI — PORTFOLIO</p>
+</div>
+
+<script>
+// root はページ（document）か、マイツールの囲い（ShadowRoot）。マイツールでは開いたときに外枠の script が呼ぶ
+window.pfStage = function (root) {
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const open = root.querySelector(".st-open");
+  // 幕開けは1回だけ。消え始めたら見出しとスクロールの動きを始める（このとき初めて画面に出ている）
+  if (!open || still) { open?.remove(); start(); return; }
+  open.addEventListener("animationstart", e => { if (e.animationName === "st-fade") start(); });
+  open.addEventListener("animationend", e => { if (e.animationName === "st-fade") open.remove(); });
+
+  function start() {
+  // 見出しを1文字ずつに分ける（<em> の中も）
+  const h1 = root.querySelector(".hero h1");
+  if (h1 && !still) {
+    const wrap = node => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const f = document.createDocumentFragment();
+          [...n.textContent].forEach(c => { const s = document.createElement("span"); s.className = "st-ch"; s.textContent = c; f.appendChild(s); });
+          n.replaceWith(f);
+        } else if (n.nodeType === 1 && n.tagName !== "BR") wrap(n);
+      });
+    };
+    wrap(h1);
+    h1.querySelectorAll(".st-ch").forEach((s, i) => s.style.transitionDelay = (i * 45) + "ms");
+    requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add("st-on")));
+  }
+  // 画面の下にあるまとまりだけ、スクロールで浮かび上がらせる（最初に見えている所はそのまま）
+  if (!still && "IntersectionObserver" in window) {
+    const items = [...root.querySelectorAll(".sec, .group-h, .case")].filter(el => el.getBoundingClientRect().top > innerHeight);
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("st-up"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -10% 0px" });
+    items.forEach(el => { el.classList.add("st-rise"); io.observe(el); });
+  }
+  }
+};
+// 見せる用のページでは、そのまま動かす（囲いの中では currentScript が取れないので動かない）
+if (document.currentScript && document.currentScript.getRootNode() === document) window.pfStage(document);
+</script>
+</body>
+</html>
