@@ -119,6 +119,17 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .kpi span { font-size: 13px; color: var(--muted); }
 .kpi b { font: 300 clamp(36px, 4.4vw, 64px)/1.1 var(--serif); font-variant-numeric: tabular-nums; }
 .kpi b .todo { font-size: 15px; }
+.kpi b small { font-size: .45em; color: var(--muted); }
+.award { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin: 0; padding: 16px 0; border-block: 1px solid var(--line); }
+.award .en { font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
+.award b { font: 500 clamp(18px, 2vw, 24px)/1.4 var(--mincho); letter-spacing: .06em; }
+.award small { font-size: 12px; color: var(--muted); }
+
+/* 担当したクライアント：社名を明朝で大きく並べる */
+.clients { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); column-gap: 32px; border-top: 1px solid var(--ink); }
+.clients li { display: grid; gap: 2px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.clients b { font: 500 clamp(18px, 2vw, 24px)/1.4 var(--mincho); letter-spacing: .04em; }
+.clients span { font: 400 12px/1.4 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
 .kpi small { font-size: 12px; color: var(--muted); }
 
 /* 事例：画像が先、その下に「番号・分類・年」と大きな英字の題、課題 → 打ち手 → 結果 */
@@ -149,7 +160,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .diagram text { font-family: var(--font); fill: var(--ink); }
 .diagram .s { fill: var(--muted); font-size: 11px; }
 
-/* AIで作ったもの：仮の画像つきの4枚 */
+/* AIで作ったもの：仮の画像つきの4枚（2026-11-01 から外している。中身は 保留_AIで作ったもの.html） */
 .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 32px; }
 .work { display: grid; gap: 12px; align-content: start; }
 .work .ph { aspect-ratio: 4 / 3; }
@@ -181,7 +192,7 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
 .strength .num { font: 300 40px/1 var(--serif); }
 .strength h3 { font-size: 16px; font-weight: 500; }
 .strength p { font-size: 13px; color: var(--muted); }
-.skills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 32px; border-top: 1px solid var(--line); padding-top: 20px; }
+.skills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; border-top: 1px solid var(--line); padding-top: 20px; }
 .skills h3 { font: 400 13px/1.4 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .skills ul { margin: 0; padding: 0; list-style: none; font-size: 13px; display: grid; gap: 2px; }
 
@@ -252,27 +263,39 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
   <section class="intro" aria-label="はじめに">
     <p class="statement en" lang="en"><span>Design with</span><span><i>numbers,</i></span><span>move with words.</span></p>
     <div class="intro-txt">
-      <p class="lead">大手インターネット広告代理店で、スマホゲームの広告運用と営業を両方担当しています。配信の設計からクライアントへの説明までを1人でつなぎ、仕事のやり方そのものを仕組みにして、AIで道具を作っています。</p>
-      <ul class="chips"><li>運用型広告</li><li>ROAS設計</li><li>グローバル配信</li><li>媒体交渉</li><li>アプリ計測</li><li>AI活用</li></ul>
+      <p class="lead">株式会社アドウェイズで、スマホゲームの広告運用と営業を両方担当しています。日本・北米・中南米・欧州への配信の設計から、クライアントへの説明までを1人でつなぎ、仕事のやり方そのものを仕組みにしています。</p>
+      <ul class="chips"><li>運用型広告</li><li>ROAS設計</li><li>グローバル配信</li><li>媒体交渉</li><li>アプリ計測</li><li>複数媒体の運用</li></ul>
     </div>
   </section>
 
   <section class="sec" id="numbers" aria-labelledby="pf-kpi-h">
     <h3 class="sec-h" id="pf-kpi-h"><span class="en">Numbers</span>数字で見る</h3>
     <div class="kpis">
-      <div class="kpi"><span class="n">01</span><span>ROAS の改善</span><b><span class="todo">【○% → ○%】</span></b><small>配信国を質と量に分けた設計で</small></div>
-      <div class="kpi"><span class="n">02</span><span>担当した広告費</span><b><span class="todo">【月 ○万円】</span></b><small>スマホゲーム <span class="todo">【○】</span>タイトル</small></div>
-      <div class="kpi"><span class="n">03</span><span>配信した国</span><b><span class="todo">【○か国】</span></b><small>多言語のクリエイティブを管理</small></div>
+      <div class="kpi"><span>担当した広告費</span><b>1,000万〜数億円<small> / 月</small></b><small>リリースの時期などで変わる</small></div>
+      <div class="kpi"><span>担当したクライアント</span><b>5<small> 社</small></b><small>国内・海外のゲーム会社</small></div>
+      <div class="kpi"><span>配信したエリア</span><b>4<small> 地域</small></b><small>日本・北米・中南米・欧州</small></div>
     </div>
+    <p class="award"><span class="en">Award</span><b>ベストルーキー賞 受賞</b></p>
   </section>
   </div>
 
   <div class="group" id="work">
-    <div class="group-h"><h2>Work</h2><p>仕事の事例・AIで作ったもの</p></div>
+    <div class="group-h"><h2>Work</h2><p>担当したクライアント・仕事の事例</p></div>
     <span class="vlabel" aria-hidden="true">Case Studies</span>
+  <section class="sec" id="clients">
+    <h3 class="sec-h"><span class="en">Clients</span>担当したクライアント</h3>
+    <ul class="clients">
+      <li><span>Konami</span><b>株式会社コナミデジタルエンタテインメント</b></li>
+      <li><span>Netmarble</span><b>Netmarble Corporation</b></li>
+      <li><span>Bushiroad</span><b>株式会社ブシロード</b></li>
+      <li><span>gumi</span><b>株式会社gumi</b></li>
+      <li><span>Capcom</span><b>株式会社カプコン</b></li>
+    </ul>
+  </section>
+
   <section class="sec" id="cases">
     <h3 class="sec-h"><span class="en">Cases</span>仕事の事例</h3>
-    <p class="sub">課題 → 打ち手 → 結果 の順に書いています。クライアント名と社外秘の数字は伏せ、割合で示しています。詳しい資料は面接でお見せできます</p>
+    <p class="sub">課題 → 打ち手 の順に短くまとめています。タイトル名と社外秘の数字は伏せています。詳しくは面接でお話しできます</p>
 
     <article class="case">
       <div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：配信設計のイメージ</span></div>
@@ -281,8 +304,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
         <div class="case-h">
           <p class="case-en en" lang="en">Quality / Volume</p>
           <h3>グローバル配信のカードゲームで、配信国を「質」と「量」に分けて設計</h3>
-          <p class="outcome">結果：ROAS <span class="todo">【○%→○%】</span></p>
-          <dl class="facts"><dt>領域</dt><dd>スマホゲーム（カードゲーム）・グローバル配信</dd><dt>期間</dt><dd><span class="todo">【20XX年○月〜○か月】</span></dd><dt>体制・役割</dt><dd><span class="todo">【○名のチームで】</span>配信設計・運用・クライアントへの報告</dd><dt>ツール</dt><dd>Google 広告（アプリキャンペーン）</dd></dl>
+          <p class="outcome">国ごとに役割と評価の物差しを分けた</p>
+          <dl class="facts"><dt>領域</dt><dd>スマホゲーム（カードゲーム）・グローバル配信</dd><dt>役割</dt><dd>配信設計・運用・クライアントへの報告</dd><dt>ツール</dt><dd>Google 広告（アプリキャンペーン）</dd></dl>
         </div>
       </div>
       <div class="rows">
@@ -311,7 +334,6 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
           <text x="498" y="172" class="s">評価：獲得数・単価</text>
         </svg>
       </div>
-      <div class="row result"><span class="k">結果</span><p>ROAS <span class="todo">【○%→○%】</span>、獲得数 <span class="todo">【○件／月】</span>。<span class="todo">【予算や評価への影響があれば】</span></p></div>
       </div>
     </article>
 
@@ -322,8 +344,8 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
         <div class="case-h">
           <p class="case-en en" lang="en">Measurement Design</p>
           <h3>アプリの新しい施策で、計測の設計からクライアントの理解まで担当</h3>
-          <p class="outcome">結果：<span class="todo">【計測できるようになったこと】</span></p>
-          <dl class="facts"><dt>領域</dt><dd>スマホゲーム・アプリの計測</dd><dt>期間</dt><dd><span class="todo">【20XX年○月〜○か月】</span></dd><dt>体制・役割</dt><dd><span class="todo">【○名のチームで】</span>計測の設計・クライアントへの説明</dd><dt>ツール</dt><dd>GA4・Firebase・Google 広告</dd></dl>
+          <p class="outcome">計測の設計から、クライアントへの説明まで担当</p>
+          <dl class="facts"><dt>領域</dt><dd>スマホゲーム・アプリの計測</dd><dt>役割</dt><dd>計測の設計・クライアントへの説明</dd><dt>ツール</dt><dd>GA4・Firebase・Google 広告</dd></dl>
         </div>
       </div>
       <div class="rows">
@@ -333,7 +355,6 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
         <li>GA4 と Google 広告を Firebase で連携する流れを図にして、クライアントに説明</li>
         <li>定例資料への指摘を受けて、報告の形を見直した</li>
       </ul></div>
-      <div class="row result"><span class="k">結果</span><p><span class="todo">【計測が正しく取れるようになった範囲・施策の成果】</span></p></div>
       </div>
     </article>
 
@@ -345,26 +366,15 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
           <p class="case-en en" lang="en">Handover</p>
           <h3>運用の引き継ぎと後輩の育成</h3>
           <p class="outcome">結果：引き継ぎを終えて、新しい案件の担当へ</p>
-          <dl class="facts"><dt>領域</dt><dd>担当タイトルの運用</dd><dt>期間</dt><dd><span class="todo">【○か月】</span></dd><dt>体制・役割</dt><dd>後輩1名への引き継ぎ・育成を担当</dd><dt>ツール</dt><dd>Excel（分析の型）・引き継ぎ資料</dd></dl>
+          <dl class="facts"><dt>領域</dt><dd>担当タイトルの運用</dd><dt>役割</dt><dd>後輩1名への引き継ぎ・育成</dd><dt>ツール</dt><dd>Excel（分析の型）・引き継ぎ資料</dd></dl>
         </div>
       </div>
       <div class="rows">
       <div class="row"><span class="k">課題</span><p>担当していたタイトルの運用を後輩に渡すことになった。判断の多くが自分の頭の中にあった。</p></div>
       <div class="row"><span class="k">打ち手</span><p>なぜその設定にしているのかを言葉にして渡し、分析の型（数字を貼ると差分と進み具合が見えるシート）も一緒に引き継いだ。</p></div>
-      <div class="row result"><span class="k">結果</span><p>引き継ぎは順調に進み、自分は新しい案件に移れた。<span class="todo">【引き継ぎ後の成果・期間】</span></p></div>
+      <div class="row result"><span class="k">結果</span><p>引き継ぎは順調に進み、自分は新しいタイトルの担当に移れた。</p></div>
       </div>
     </article>
-  </section>
-
-  <section class="sec" id="works">
-    <h3 class="sec-h"><span class="en">Side Works</span>AIで作ったもの</h3>
-    <p class="sub">会社では調べ物・資料のHTML化・軽いツール作りに Claude Code を使っています。個人では暮らしと仕事の道具を作っています</p>
-    <div class="two">
-      <div class="work"><div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：へやマッチの画面</span></div><div class="work-h"><span class="num">01</span><h3>へやマッチ</h3></div><p>引っ越し先の候補を、写真を見て「アリ・ナシ・本命」にスワイプで振り分けるアプリ。2年間の実質コストと通勤時間を自動で計算し、比較表で裏付けます。</p><span class="nums">候補 70件 / 写真 413枚 / 改良 26回</span></div>
-      <div class="work"><div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：マイツールの画面</span></div><div class="work-h"><span class="num">02</span><h3>マイツール</h3></div><p>家計簿とタスク管理を1つのページにまとめた自分用の道具。スマホとPCのどちらでも使え、色や部品の決まり（デザインシステム）も自分で作りました。</p><span class="nums">家計簿 + タスク管理 / スマホ・PC 両対応</span></div>
-      <div class="work"><div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：第二の脳のしくみ</span></div><div class="work-h"><span class="num">03</span><h3>第二の脳</h3></div><p>メモ・日記・調べたことを1か所にためて、AI が毎朝「今日やる3つ」を出し、毎晩日報の下書きを作る仕組み。週1回、改善点を自分で見つけて回します。</p><span class="nums">自動実行 5本（朝・夜・週次）</span></div>
-      <div class="work"><div class="ph" aria-hidden="true"><span class="ph-tag">仮の画像：比べて選ぶ流れ</span></div><div class="work-h"><span class="num">04</span><h3>作る前に調べる</h3></div><p>作る前に、似たオープンソースを2〜3件比べて、良い作り方を選んでから作ります。入れるソフトは安全かどうかを毎回確かめます。</p><span class="nums">デモは面接でお見せできます</span></div>
-    </div>
   </section>
   </div>
 
@@ -378,14 +388,14 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
       <div class="profile">
         <div class="profile-name"><b class="en" lang="en">Takumi</b><span>たくみ　ゲーム広告の運用・営業</span></div>
         <dl>
-          <dt>仕事</dt><dd>大手インターネット広告代理店　ゲームの広告運用・営業</dd>
+          <dt>仕事</dt><dd>株式会社アドウェイズ　ゲームの広告運用・営業</dd>
           <dt>経験</dt><dd>Web 広告運用・営業　2025年4月〜（新卒入社）</dd>
-          <dt>拠点</dt><dd><span class="todo">【東京など】</span></dd>
+          <dt>拠点</dt><dd>東京</dd>
           <dt>好きなもの</dt><dd>アニメ・漫画、絵を描くこと</dd>
         </dl>
         <div class="story">
           <div><h3>いま</h3><p>スマホゲームの広告で、配信の設計・運用と、クライアントへの提案・報告を1人で受け持っています。数字を見て組み方を決め、それを相手にわかる言葉で説明するのが、いちばん得意な仕事です。</p></div>
-          <div><h3>広告の仕事を選んだ理由</h3><p>アニメや漫画を、作る側ではなく「外から広める側」から見たかったからです。作品がどう見つけられ、どう遊ばれ、どう課金されるのかを、数字で追える場所として広告代理店を選びました。2025年に大学を卒業し、新卒で大手インターネット広告代理店に入社、ゲームマーケティングの部門に配属されました。</p></div>
+          <div><h3>広告の仕事を選んだ理由</h3><p>アニメや漫画を、作る側ではなく「外から広める側」から見たかったからです。作品がどう見つけられ、どう遊ばれ、どう課金されるのかを、数字で追える場所として広告代理店を選びました。2025年に大学を卒業し、新卒で株式会社アドウェイズに入社、ゲームマーケティングの部門に配属されました。</p></div>
           <div><h3>大事にしていること</h3><p>あいまいな言い方をせず、言い切ること。うまい人のやり方をまず真似して、自分の型にすること。一度やったことは、次の人が使える形に残すこと。</p></div>
         </div>
       </div>
@@ -400,17 +410,16 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
       <div class="strength"><span class="num en">03</span><h3>仕組み化</h3><p>数字を貼るだけで差分が見える分析シート、ガントチャートでの段取り、言葉にした引き継ぎ資料。人に頼った作業を型にします。</p></div>
     </div>
     <div class="skills">
-      <div><h3>Ad Ops</h3><ul><li>Google 広告（アプリキャンペーン）</li><li>ROAS・ARPU を軸にした配信設計</li><li>グローバル・多言語の配信</li><li><span class="todo">【ほかの媒体】</span></li></ul></div>
+      <div><h3>Ad Ops</h3><ul><li>Google 広告（アプリキャンペーン）</li><li>Meta・X・TikTok・Apple Ads</li><li>UNICORN・Zucks などの DSP／アドネットワーク</li><li>ROAS・ARPU を軸にした配信設計</li><li>グローバル・多言語の配信</li></ul></div>
       <div><h3>Analytics</h3><ul><li>GA4・Firebase 連携</li><li>タグ・トリガーの設計</li><li>Excel での分析の型づくり</li></ul></div>
       <div><h3>Sales</h3><ul><li>クライアントへの定例報告</li><li>媒体との交渉</li><li>ガントチャートでの段取り</li></ul></div>
-      <div><h3>AI &amp; Craft</h3><ul><li>Claude Code でのツール作り</li><li>資料の HTML 化</li><li>画像生成（ComfyUI）</li></ul></div>
     </div>
   </section>
 
   <section class="sec" id="career">
     <h3 class="sec-h"><span class="en">Career</span>経歴</h3>
     <ol class="timeline">
-      <li><time>2025.04 —</time><div><h3>大手インターネット広告代理店　ゲームマーケティング部門</h3><p>営業（プランナー／コンサルタント）。法人営業・営業企画・広告戦略の立案と実行。スマホゲームの広告運用と営業を兼任し、グローバル配信の設計、クライアント対応、後輩への引き継ぎも担当。</p></div></li>
+      <li><time>2025.04 —</time><div><h3>株式会社アドウェイズ　ゲームマーケティング部門</h3><p>営業（プランナー／コンサルタント）。法人営業・営業企画・広告戦略の立案と実行。ゲーム会社5社のスマホゲームを担当し、広告運用と営業を兼任。日本・北米・中南米・欧州への配信の設計、クライアント対応、後輩への引き継ぎも担当。ベストルーキー賞を受賞。</p></div></li>
       <li><time>2025.03</time><div><h3>大学卒業</h3><p>卒業後、新卒で現在の会社に入社。</p></div></li>
     </ol>
   </section>
@@ -425,13 +434,13 @@ a:hover .ph::before, article:hover .ph::before { transform: scale(1.04); }
     <div class="group-h"><h2>Contact</h2><p>選考・面談のご連絡はこちらへ</p></div>
   <section class="sec">
     <dl class="contact">
-      <dt>Mail</dt><dd><span class="todo">【転職用のアドレス】</span></dd>
-      <dt>LinkedIn</dt><dd><span class="todo">【URL】</span></dd>
+      <dt>Mail</dt><dd>huyejiang1@gmail.com</dd>
+      <dt>Base</dt><dd>東京</dd>
     </dl>
   </section>
   </div>
 
-  <p class="foot"><span>担当タイトル名・クライアント名は伏せています</span><span class="en">TAKUMI — PORTFOLIO © 2026</span></p>
+  <p class="foot"><span>担当タイトル名と社外秘の数字は伏せています</span><span class="en">TAKUMI — PORTFOLIO © 2026</span></p>
 </div>
 </div>
 
