@@ -27,7 +27,7 @@
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --gut: max(clamp(16px, 4vw, 64px), env(safe-area-inset-left, 0px));
   /* 読む部分の幅。左右の余り（--side）には飾りを散らす */
-  --wrap: 1180px; --side: max(var(--gut), calc((100vw - var(--wrap)) / 2));
+  --wrap: 1360px;  /* 表示の幅（2026-11-02 たくみ「もう少し横を広げて」で 1180px から広げた） */ --side: max(var(--gut), calc((100vw - var(--wrap)) / 2));
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -640,7 +640,7 @@ const glowTex = (() => {
 })();
 // クリスタル（2026-11-02 たくみ「自作の3Dで、参考と同じものを作って」）：参考（CGTrader の Crystal）のデータは使わず、見た目だけを近づけてページ側で作る。
 // 参考の特徴：太さと高さの比がおよそ 1:2.3 のずんぐりした1本の結晶、少し片寄った先のとがり、先の近くに細かい面、柱は少し波打つ面、
-// 平らな底。色は下が濃い青、真ん中が青紫、上がラベンダーピンクのガラス。表面に流れるような映り込み
+// 平らな底（ここは参考と変えて、下もとがらせる）。色は下が濃い青、真ん中が青紫、上がラベンダーピンクのガラス
 // 形は決まった並びの乱数（seed）で作る。seed を変えると、同じ作りで形の違う結晶になる（ちりばめで使う）
 const makeCrystalGeo = seed => {
   let s = seed; const r = () => (s = (s * 16807) % 2147483647) / 2147483647 - .5;
@@ -649,9 +649,10 @@ const makeCrystalGeo = seed => {
   const rad = Array.from({ length: N }, (_, i) => i % 2 ? (base6[(i - 1) / 2] + base6[(i + 1) / 2 % 6]) / 2 * (1.0 + r() * .12) : base6[i / 2]);
   const ang = Array.from({ length: N }, (_, i) => (i + r() * .25) / N * Math.PI * 2);
   // 段：底から先まで。k は太さ、jy は高さのずれ、jr は太さのずれ（上ほど不ぞろい）
-  const rings = [[-1.0, .9, .03, .04], [-.62, .98, .06, .05], [-.2, 1, .07, .05], [.22, 1, .08, .06], [.58, .97, .1, .07], [.86, .82, .14, .1], [1.1, .5, .14, .2]];
+  // 下も平らにせず、上より少し短いとがりにする（2026-11-02 たくみ「下が平なので尖らせて」）
+  const rings = [[-1.3, .48, .12, .18], [-1.0, .9, .03, .04], [-.62, .98, .06, .05], [-.2, 1, .07, .05], [.22, 1, .08, .06], [.58, .97, .1, .07], [.86, .82, .14, .1], [1.1, .5, .14, .2]];
   const R = rings.map(([y, k, jy, jr]) => ang.map((a, i) => { const q = rad[i] * k * (1 + r() * jr * 2); return new THREE.Vector3(Math.cos(a) * q, y + r() * jy * 2, Math.sin(a) * q * .88); }));
-  const apex = new THREE.Vector3(.1 + r() * .1, 1.42 + r() * .1, -.04 + r() * .1), base = new THREE.Vector3(r() * .05, -1.04, r() * .05);
+  const apex = new THREE.Vector3(.1 + r() * .1, 1.42 + r() * .1, -.04 + r() * .1), base = new THREE.Vector3(-.06 + r() * .1, -1.7 - r() * .1, r() * .1);
   const pos = [], uv = [], tri = (...v) => v.forEach(p => { pos.push(p.x, p.y, p.z); uv.push((Math.atan2(p.z, p.x) / (Math.PI * 2) + 1) % 1, (p.y + 1.1) / 2.6); });
   for (let k = 0; k < R.length - 1; k++) for (let i = 0; i < N; i++) { const j = (i + 1) % N, A = R[k], B = R[k + 1]; tri(A[i], B[i], B[j]); tri(A[i], B[j], A[j]); }
   const T = R[R.length - 1], Bt = R[0];
@@ -659,7 +660,7 @@ const makeCrystalGeo = seed => {
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
   // 色：下の濃い青 → 青紫 → 紫 → 上のラベンダーピンク
-  const stops = [[-1.05, 0x1d34d8], [-.35, 0x3540d6], [.35, 0x6a4fd8], [.95, 0xa77ee0], [1.5, 0xe2b4ee]].map(([y, h]) => [y, new THREE.Color(h)]);
+  const stops = [[-1.75, 0x1a2cc8], [-1.05, 0x1d34d8], [-.35, 0x3540d6], [.35, 0x6a4fd8], [.95, 0xa77ee0], [1.5, 0xe2b4ee]].map(([y, h]) => [y, new THREE.Color(h)]);
   const col = [], c = new THREE.Color();
   for (let i = 1; i < pos.length; i += 3) {
     const y = pos[i]; let k = 0; while (k < stops.length - 2 && y > stops[k + 1][0]) k++;
