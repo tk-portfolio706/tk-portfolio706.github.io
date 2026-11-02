@@ -292,6 +292,8 @@ html.locked, html.locked body { overflow: hidden; }
    右側にゆっくり浮かんで回り、スクロールでも回り、マウス・指の方へ少し傾く。窓は少し透けるので、後ろに見える。
    形は Blender で作った gem.glb（元は gem.blend）。読み込めないときは three.js で近い形を描く */
 .gem { position: absolute; right: max(-8vw, calc((100vw - var(--wrap)) / 2 - 24vw)); top: 42%; translate: 0 -50%; width: min(38vw, 620px); aspect-ratio: 1; }
+/* ちりばめ：ページ全体に浮かべるクリスタルとアイテム（背景に固定。スクロールで奥行きごとに動く） */
+.scatter { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* ゲームのコントローラー（2026-11-02 たくみ「コントローラーも作って」）。Blender で作った controller.glb。左下の余白に、ひし形と向かい合うように */
 .pad { position: absolute; left: max(-3vw, calc((100vw - var(--wrap)) / 2 - 14vw)); top: 80%; translate: 0 -50%; width: min(28vw, 440px); aspect-ratio: 1; }
 
@@ -338,8 +340,9 @@ html.locked, html.locked body { overflow: hidden; }
 <div class="crt" aria-hidden="true"></div>
 <div class="bg" aria-hidden="true">
   <div class="smoke"><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow pointer"><i></i></span></div>
+  <canvas class="scatter"></canvas>
   <canvas class="gem m3d" data-model="gem.glb" data-kind="gem"></canvas>
-  <canvas class="pad m3d" data-model="controller.glb" data-kind="pad"></canvas>
+  <canvas class="pad m3d" data-kind="pad"></canvas>
   <div class="deco">
     <span class="d-ring" style="--x:5%;--y:18%;--r:140px;--k:30;--o:.55"></span>
     <span class="d-cross" style="--x:93%;--y:14%;--k:50"></span>
@@ -623,55 +626,140 @@ const crystalGeo = (() => {
 const buildCrystals = group => {
   // 透けて奥が屈折するガラス、うすい群青の吸収、虹色の照り
   // 半分透ける群青のガラス。面ごとに映り込みが変わり、カットした宝石のように見える
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0x5677e8, metalness: .15, roughness: .06, transmission: .55, thickness: 1, ior: 1.6,
-    attenuationColor: 0x3f5fd8, attenuationDistance: 1.2, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 2.6,
-    emissive: 0x16246e, emissiveIntensity: .5, iridescence: .4, iridescenceIOR: 1.3, flatShading: true });
-  // まわりの結晶は少し色を濃くして、主役と見分ける
-  const glass2 = glass.clone(); glass2.color.set(0x4566d8); glass2.transmission = .4;
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0x5677e8, metalness: .15, roughness: .2, transmission: .55, thickness: 1, ior: 1.6,
+    attenuationColor: 0x3f5fd8, attenuationDistance: 1.2, clearcoat: .25, clearcoatRoughness: .35, envMapIntensity: 1.1,
+    emissive: 0x16246e, emissiveIntensity: .5, iridescence: .15, iridescenceIOR: 1.3, flatShading: true });
   const main = new THREE.Mesh(crystalGeo, glass);
   const core = new THREE.Mesh(crystalGeo, new THREE.MeshBasicMaterial({ color: 0x5f86ff })); core.scale.set(.12, .6, .12); main.add(core);  // 中心の細い光の芯
   main.scale.setScalar(.82);
   group.add(main);  // 動きの処理は、最初の子を主役として回す
-  // 大中小の結晶：主役のまわりに、奥行きを変えて浮かべる（[大きさ, x, y, z, 傾き]）
-  const spots = [[.36, -1.45, .9, -.6, .5], [.3, 1.35, -1.0, -.3, -.6], [.2, 1.15, 1.3, .4, .3], [.16, -1.25, -1.25, .5, -.4],
-                 [.11, -.8, 1.7, .2, .8], [.09, 1.65, .25, -.8, -.2], [.08, -1.75, -.15, .3, .9], [.06, .7, -1.8, .6, .4]];
-  const sats = spots.map(([k, x, y, z, tilt], n) => {
-    const m = new THREE.Mesh(crystalGeo, glass2);
-    m.scale.setScalar(k); m.position.set(x, y, z); m.rotation.z = tilt;
-    group.add(m);
-    return { m, y, speed: .25 + n * .05, phase: n * 1.3 };
-  });
   // うしろの白っぽい光のにじみは付けない（2026-11-02 たくみ「周りが白くなるものもやめて」）
-  // 小さな粒：ゆっくり回るだけで、明るさは一定（点滅しない）
-  const n = 90, pos = new Float32Array(n * 3);
-  for (let i = 0; i < n; i++) { const r = 1 + Math.random() * 1.2, a = Math.random() * Math.PI * 2; pos.set([Math.cos(a) * r, (Math.random() - .5) * 4, Math.sin(a) * r * .6], i * 3); }
-  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const dust = new THREE.Points(geo, new THREE.PointsMaterial({ map: glowTex, color: 0xa9bcff, size: .16, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false }));
-  group.add(dust);
-  return { sats, dust };
+  // 大中小の結晶と粒は、主役のまわりではなくページ全体にちりばめる（下の「ちりばめ」。2026-11-02 たくみ）
+  return {};
 };
+const crystalGlass = () => new THREE.MeshPhysicalMaterial({ color: 0x4566d8, metalness: .15, roughness: .2, transmission: .4, thickness: 1, ior: 1.6,
+  attenuationColor: 0x3f5fd8, attenuationDistance: 1.2, clearcoat: .25, clearcoatRoughness: .35, envMapIntensity: 1.1,
+  emissive: 0x16246e, emissiveIntensity: .5, iridescence: .15, iridescenceIOR: 1.3, flatShading: true });
 
 // コントローラー：つや消しの黒い本体に、十字キーは水色、ボタンはピンクの光る縁（2026-11-02 たくみの参考画像の雰囲気。絵や形は写さない）
 const dressPad = root => {
   const mats = {
-    Pad2_Body: new THREE.MeshPhysicalMaterial({ color: 0x1b1e26, roughness: .62, metalness: 0, clearcoat: .15, clearcoatRoughness: .5, envMapIntensity: .8 }),
-    Pad2_Key: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .45 }),
+    Pad2_Body: new THREE.MeshPhysicalMaterial({ color: 0x1b1e26, roughness: .78, metalness: 0, sheen: .4, sheenRoughness: .8, sheenColor: 0x3a4466, envMapIntensity: .5 }),
+    Pad2_Key: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .6 }),
     Pad2_Dark: new THREE.MeshStandardMaterial({ color: 0x13151b, roughness: .5 }),
-    Pad2_Stick: new THREE.MeshStandardMaterial({ color: 0x2a2f3a, roughness: .5 }),
-    Pad2_Accent: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .45 }),
+    Pad2_Stick: new THREE.MeshStandardMaterial({ color: 0x2a2f3a, roughness: .7 }),
+    Pad2_Accent: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .6 }),
   };
   // 光る縁：部品を少し大きく写して、少し下に置く（上に乗る部品のまわりだけが縁として見える）。明るさは一定（点滅しない）
   const cyan = new THREE.MeshBasicMaterial({ color: 0x42e3ff, toneMapped: false });
   const pink = new THREE.MeshBasicMaterial({ color: 0xff4fd2, toneMapped: false });
   const rim = (o, mat, sx, sz) => { const g = new THREE.Mesh(o.geometry, mat); g.scale.set(sx, .7, sz); g.position.y = -.012; o.add(g); };
+  // 部品の置き場所（2026-11-02 たくみ「ボタンの位置がおかしい」）：元はスティックが本体の下の縁からはみ出し、十字キーとボタンが上の縁に寄っていた。
+  // 十字キーとボタンは左右の上寄りの真ん中に、スティックは内側の本体の上に、小さいボタン2つと印はその上に並べる（x は左右、z は手前ほど大きい）
+  const at = { Dpad: [-1.1, .12], Stick0: [-.45, .2], Stick1: [.45, .2], Mid0: [-.2, -.3], Mid1: [.2, -.3], Mark: [0, -.3] };
+  const btn = [[0, -.17], [.17, 0], [0, .17], [-.17, 0]];  // 上・右・下・左
   const parts = []; root.traverse(o => { if (o.isMesh) parts.push(o); });
   for (const o of parts) {
+    // 真ん中が細すぎる（2026-11-02 たくみ）：本体の手前側（z がプラス）を、左右の持ち手には触れずに真ん中ほど長く伸ばす
+    if (o.name === "Pad2_Body") {
+      const a = o.geometry.attributes.position;
+      for (let i = 0; i < a.count; i++) {
+        const z = a.getZ(i); if (z <= 0) continue;
+        const k = .85 * (1 - THREE.MathUtils.smoothstep(Math.abs(a.getX(i)), .55, 1.05));
+        a.setZ(i, z * (1 + k));
+      }
+      a.needsUpdate = true; o.geometry.computeVertexNormals(); o.geometry.computeBoundingBox(); o.geometry.computeBoundingSphere();
+    }
+    const n = o.name.replace("Pad2_", ""), key = n.startsWith("Dpad") ? "Dpad" : n.startsWith("Stick") ? "Stick" + n.slice(-1) : n;
+    if (at[key]) { o.position.x = at[key][0]; o.position.z = at[key][1]; }
+    const b = /^Btn(\d)$/.exec(n);
+    if (b) { o.position.x = 1.1 + btn[b[1]][0]; o.position.z = .12 + btn[b[1]][1]; }
     if (mats[o.material?.name]) o.material = mats[o.material.name];
     if (o.name === "Pad2_DpadBase") o.material = mats.Pad2_Body;  // 十字キーの下の円は本体と同じ色にして目立たせない
     if (o.name === "Pad2_DpadH") rim(o, cyan, 1.14, 1.5);
     if (o.name === "Pad2_DpadV") rim(o, cyan, 1.5, 1.14);
     if (/^Pad2_Btn\d$/.test(o.name)) rim(o, pink, 1.38, 1.38);
   }
+};
+
+// 角ばったコントローラー（2026-11-02 たくみ「参考にして自作」）：CGTrader の Stylized Game Controller の「角ばったローポリ」という作り方だけを参考にし、形は写さない。
+// 外形は直線だけの多角形、角は1段の面取りで、クリスタルと同じ多面体の見た目にそろえる。スティックの頭は群青のガラス、真ん中に小さな結晶の印
+const buildFacetPad = () => {
+  const root = new THREE.Group(); root.userData.facet = true;
+  const flat = (o, m) => { const r = new THREE.Mesh(o, m); return r; };
+  const body = new THREE.MeshPhysicalMaterial({ color: 0x1b1e26, roughness: .78, sheen: .4, sheenRoughness: .8, sheenColor: 0x3a4466, envMapIntensity: .5, flatShading: true });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x13151b, roughness: .65, flatShading: true });
+  const key = new THREE.MeshStandardMaterial({ color: 0x17191f, roughness: .6, flatShading: true });
+  const cyan = new THREE.MeshBasicMaterial({ color: 0x42e3ff, toneMapped: false }), pink = new THREE.MeshBasicMaterial({ color: 0xff4fd2, toneMapped: false });
+  const line = new THREE.LineBasicMaterial({ color: 0x3a4670, transparent: true, opacity: .55 });  // 面の境目をうすく見せる
+  // 外形（右半分。x は左右、y は奥ほど大きい）。左は鏡写しにする
+  const half = [[0, .55], [.7, .6], [1.25, .52], [1.6, .27], [1.73, -.08], [1.7, -.5], [1.55, -.95], [1.3, -1.13], [1.04, -1.06], [.84, -.7], [.55, -.43], [0, -.38]];
+  const pts = [...half, ...half.slice(1, -1).reverse().map(([x, y]) => [-x, y])];
+  const shape = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y)));
+  const D = .3, B = .1;
+  const bg = new THREE.ExtrudeGeometry(shape, { depth: D, bevelEnabled: true, bevelThickness: B, bevelSize: B, bevelSegments: 1 });
+  bg.translate(0, 0, -D / 2); bg.rotateX(-Math.PI / 2);  // 上の面（ボタンのある面）を +Y に。奥（形の y）は -Z になる
+  const top = D / 2 + B;
+  const bm = flat(bg, body); bm.add(new THREE.LineSegments(new THREE.EdgesGeometry(bg, 20), line)); root.add(bm);
+  const at = (o, x, y, h) => { o.position.set(x, top + h, -y); root.add(o); return o; };
+  const prism = (r, h, n, m) => flat(new THREE.CylinderGeometry(r, r, h, n), m);
+  // 肩のボタン（奥の縁に半分埋める）
+  for (const sx of [-1, 1]) { const g = new THREE.BoxGeometry(.62, .14, .16); at(flat(g, dark), sx * 1.0, .56, -.12).rotation.y = sx * -.12; }
+  // 十字キー：面取りした十字の板、まわりに水色の光る縁
+  const cs = new THREE.Shape(); const a = .095, b = .29;
+  [[-a, -b], [a, -b], [a, -a], [b, -a], [b, a], [a, a], [a, b], [-a, b], [-a, a], [-b, a], [-b, -a], [-a, -a]].forEach(([x, y], i) => i ? cs.lineTo(x, y) : cs.moveTo(x, y));
+  const cg = new THREE.ExtrudeGeometry(cs, { depth: .05, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 1 }); cg.rotateX(-Math.PI / 2);
+  const dpad = at(flat(cg, key), -1.12, .02, .01);
+  const glow = flat(cg, cyan); glow.scale.set(1.1, .5, 1.1); glow.position.y = -.012; dpad.add(glow);
+  // ボタン4つ：八角の柱、まわりにピンクの光る輪
+  for (const [dx, dy] of [[0, .18], [.18, 0], [0, -.18], [-.18, 0]]) {
+    const btn = at(prism(.075, .07, 8, key), 1.12 + dx, .02 + dy, .03);
+    const ring = prism(.1, .03, 8, pink); ring.position.y = -.025; btn.add(ring);
+  }
+  // スティック：八角の台、六角の軸、頭は群青のガラス（クリスタルと同じ質感）
+  const capMat = crystalGlass();
+  for (const sx of [-1, 1]) {
+    at(flat(new THREE.CylinderGeometry(.21, .24, .05, 8), dark), sx * .5, -.12, .02);
+    at(prism(.065, .14, 6, dark), sx * .5, -.12, .1);
+    at(flat(new THREE.CylinderGeometry(.15, .19, .08, 8), capMat), sx * .5, -.12, .2);
+  }
+  // 小さなボタン2つと、真ん中の結晶の印（群青に光る）
+  for (const sx of [-1, 1]) at(prism(.045, .03, 6, key), sx * .26, .3, .015);
+  const mark = flat(new THREE.OctahedronGeometry(.07, 0), new THREE.MeshBasicMaterial({ color: 0x5f86ff, toneMapped: false })); mark.scale.set(.8, .5, 1.25); at(mark, 0, .26, .02);
+  return root;
+};
+
+// 角ばったゲーム機（ちりばめ用。2026-11-02 たくみ「そろえる」）：コントローラーと同じ作り方。角を斜めに落とした板に、暗いガラスの画面、
+// 水色の十字キー、ピンクの輪のボタン、真ん中に結晶の印
+const buildFacetHandheld = () => {
+  const root = new THREE.Group();
+  const body = new THREE.MeshPhysicalMaterial({ color: 0x1b1e26, roughness: .78, sheen: .4, sheenRoughness: .8, sheenColor: 0x3a4466, envMapIntensity: .5, flatShading: true });
+  const key = new THREE.MeshStandardMaterial({ color: 0x17191f, roughness: .6, flatShading: true });
+  const cyan = new THREE.MeshBasicMaterial({ color: 0x42e3ff, toneMapped: false }), pink = new THREE.MeshBasicMaterial({ color: 0xff4fd2, toneMapped: false });
+  const line = new THREE.LineBasicMaterial({ color: 0x3a4670, transparent: true, opacity: .55 });
+  const plate = (pts, depth, bevel) => { const g = new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y))), { depth, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 1 }); g.translate(0, 0, -depth / 2); g.rotateX(-Math.PI / 2); return g; };
+  const oct = (w, h, c) => [[-w + c, -h], [w - c, -h], [w, -h + c], [w, h - c], [w - c, h], [-w + c, h], [-w, h - c], [-w, -h + c]];
+  const D = .24, B = .08, top = D / 2 + B;
+  const bg = plate(oct(1.75, .92, .32), D, B);
+  const bm = new THREE.Mesh(bg, body); bm.add(new THREE.LineSegments(new THREE.EdgesGeometry(bg, 20), line)); root.add(bm);
+  const at = (o, x, y, h) => { o.position.set(x, top + h, -y); root.add(o); return o; };
+  // 画面：黒い枠と、うすく群青に光る暗いガラス
+  at(new THREE.Mesh(plate(oct(1.0, .66, .12), .02, .015), new THREE.MeshStandardMaterial({ color: 0x0b0c10, roughness: .5, flatShading: true })), 0, .06, .01);
+  at(new THREE.Mesh(plate(oct(.88, .54, .08), .01, 0), new THREE.MeshStandardMaterial({ color: 0x0a0d18, roughness: .35, emissive: 0x22306a, emissiveIntensity: .8 })), 0, .06, .035);
+  // 十字キー
+  const cs = new THREE.Shape(); const a = .08, b = .24;
+  [[-a, -b], [a, -b], [a, -a], [b, -a], [b, a], [a, a], [a, b], [-a, b], [-a, a], [-b, a], [-b, -a], [-a, -a]].forEach(([x, y], i) => i ? cs.lineTo(x, y) : cs.moveTo(x, y));
+  const cg = new THREE.ExtrudeGeometry(cs, { depth: .05, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 1 }); cg.rotateX(-Math.PI / 2);
+  const dpad = at(new THREE.Mesh(cg, key), -1.36, .1, .01);
+  const glow = new THREE.Mesh(cg, cyan); glow.scale.set(1.1, .5, 1.1); glow.position.y = -.012; dpad.add(glow);
+  // ボタン4つ
+  for (const [dx, dy] of [[0, .16], [.16, 0], [0, -.16], [-.16, 0]]) {
+    const btn = at(new THREE.Mesh(new THREE.CylinderGeometry(.065, .065, .07, 8), key), 1.36 + dx, .1 + dy, .03);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(.088, .088, .03, 8), pink); ring.position.y = -.025; btn.add(ring);
+  }
+  // 画面の下に結晶の印
+  const mark = new THREE.Mesh(new THREE.OctahedronGeometry(.06, 0), new THREE.MeshBasicMaterial({ color: 0x5f86ff, toneMapped: false })); mark.scale.set(.8, .5, 1.25); at(mark, 0, -.74, .02);
+  return root;
 };
 
 document.querySelectorAll("canvas.m3d").forEach(canvas => {
@@ -709,10 +797,11 @@ document.querySelectorAll("canvas.m3d").forEach(canvas => {
     obj.position.multiplyScalar(s);
     group.add(obj);
     if (kind === "pad") group.rotation.set(1.05, .25, 0);  // ボタンのある面がこちらを向くように（止まっているときも）
-    if (kind === "pad") dressPad(obj);
+    if (kind === "pad" && !obj.userData.facet) dressPad(obj);
     view.draw();
   };
-  loader.load(canvas.dataset.model,
+  if (kind === "pad") put(buildFacetPad());  // コントローラーはページ側で作る（角ばった形）
+  else loader.load(canvas.dataset.model,
     gltf => put(gltf.scene),
     undefined,
     () => { if (kind === "gem") put(withEdges(placeholder())); });
@@ -753,6 +842,70 @@ if (!still && views.length) {
       v.draw();
     }
   });
+}
+
+// ちりばめ：ページ全体に、大中小のクリスタル・小さな粒・たくみらしいアイテムを浮かべる（2026-11-02 たくみ）
+// 1枚の canvas を背景に固定し、物はページの縦の長さに沿って並べる。スクロールでカメラが下りるので、奥の物ほどゆっくり動いて見える
+// アイテムはゲーム機（スタート画面と同じ形を小さく）。明るさは一定（点滅しない）
+const scatterCanvas = document.querySelector(".scatter");
+if (scatterCanvas && getComputedStyle(scatterCanvas).display !== "none") {
+  const renderer = new THREE.WebGLRenderer({ canvas: scatterCanvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .9;
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture; scene.environmentIntensity = .5;
+  new HDRLoader().load(hdrUrl, hdr => { hdr.mapping = THREE.EquirectangularReflectionMapping; scene.environment = pmrem.fromEquirectangular(hdr).texture; hdr.dispose(); }, undefined, () => {});
+  scene.add(new THREE.AmbientLight(0xffffff, .4));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(3, 4, 5); scene.add(key);
+  const rim = new THREE.DirectionalLight(0x2e45a3, 2); rim.position.set(-4, 2, -4); scene.add(rim);
+  const camera = new THREE.PerspectiveCamera(30, 1, .1, 60); camera.position.z = 12;
+  const UNIT = 2 * 12 * Math.tan(THREE.MathUtils.degToRad(15));  // 画面1枚ぶんの高さ（奥行き 0 のところ）
+
+  // アイテムはゲーム機だけ（2026-11-02 たくみ「クリスタルとゲーム機でお願い」）。形は角ばったゲーム機（buildFacetHandheld）にそろえる（同日「そろえる」）
+  const slots = [];  // ゲーム機を入れる場所。下で並べ終えたら、それぞれに1台ずつ入れる
+
+  // 決まった並びの乱数（読み込むたびに配置が変わらないように）
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const glass = crystalGlass(), objs = [];
+  const add = (m, k, row, side, depth, spin) => { m.scale.setScalar(k); m.rotation.set((rnd() - .5) * .8, rnd() * 6, (rnd() - .5) * .8); scene.add(m); objs.push({ m, row, side, depth, spin, phase: rnd() * 6 }); };
+  // 画面1枚ぶんを1段として、段ごとに左右の端へ置く（文章のカードの裏に隠れないよう、真ん中はあける）
+  const rows = Math.ceil(document.documentElement.scrollHeight / innerHeight) + 1, small = innerWidth < 700;
+  for (let r = 0; r < rows; r++) {
+    for (let i = 0; i < (small ? 2 : 4); i++) {
+      const side = (i % 2 ? 1 : -1) * (.62 + rnd() * .36), row = r + rnd(), depth = -rnd() * 5;
+      if (r === 0 && side > 0) continue;  // 最初の画面の右は主役のクリスタルの場所
+      const big = rnd(), k = big > .85 ? .7 : big > .5 ? .42 : .24;  // 大・中・小
+      const cm = new THREE.Mesh(crystalGeo, glass); add(cm, k, row, side, depth, .2 + rnd() * .3);
+    }
+    // 段ごとにゲーム機を1つ（左右を交互に）
+    const side = (r % 2 ? 1 : -1) * (.6 + rnd() * .3);
+    if (!(r === 0 && side > 0)) { const g = new THREE.Group(); slots.push(g); add(g, .8 + rnd() * .4, r + .3 + rnd() * .5, side, -rnd() * 1.5, .15 + rnd() * .2); g.rotation.x = (rnd() - .5) * .4; g.rotation.z = (rnd() - .5) * .3; }
+  }
+  const unit = buildFacetHandheld(); unit.scale.setScalar(1.7 / 3.66); unit.rotation.x = Math.PI / 2 - .35;  // ボタンのある面をこちらへ（外側の入れ物が縦の軸で回る）
+  for (const g of slots) g.add(unit.clone());
+  // 小さな粒：ページ全体にうすく。明るさは一定
+  const n = rows * (small ? 25 : 45), pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) pos.set([(rnd() - .5) * 2.4, -rnd() * rows * UNIT, -rnd() * 6], i * 3);
+  const dg = new THREE.BufferGeometry(); dg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const dust = new THREE.Points(dg, new THREE.PointsMaterial({ map: glowTex, color: 0xa9bcff, size: .14, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false }));
+  scene.add(dust);
+
+  // 置き場所：段と奥行きから、画面の幅に合わせて決める（横は「その奥行きで見える幅」の割合）
+  const place = () => {
+    const half = d => (12 - d) * Math.tan(THREE.MathUtils.degToRad(15)) * camera.aspect;
+    for (const o of objs) { o.m.position.set(o.side * half(o.depth), -o.row * UNIT * (12 - o.depth) / 12, o.depth); o.y = o.m.position.y; }
+    dust.scale.x = half(0) / 1.2;
+  };
+  const fit = () => { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); place(); };
+  addEventListener("resize", fit); fit();
+  const draw = t => {
+    camera.position.y = -scrollY / innerHeight * UNIT;
+    for (const o of objs) { o.m.rotation.y = t * o.spin + o.phase; o.m.position.y = o.y + Math.sin(t * .5 + o.phase) * .06; }
+    renderer.render(scene, camera);
+  };
+  if (still) { draw(0); addEventListener("scroll", () => draw(0), { passive: true }); }
+  else renderer.setAnimationLoop(() => draw(clock.getElapsedTime()));
 }
 </script>
 <script type="module">
@@ -824,6 +977,24 @@ if (canvas) (async () => {
     });
     tex.needsUpdate = true;
   };
+  // 見た目：青いつやのあるプラスチックをやめ、コントローラーとそろえたつや消しの黒に、十字キーは水色、ボタンはピンクの光る縁（2026-11-02 たくみ「チープすぎてサイトの UI と合わない」「てかてかし過ぎ」）
+  const hm = {
+    HH_Body: new THREE.MeshPhysicalMaterial({ color: 0x1b1e26, roughness: .78, metalness: 0, sheen: .4, sheenRoughness: .8, sheenColor: 0x3a4466, envMapIntensity: .5 }),
+    HH_Bezel: new THREE.MeshStandardMaterial({ color: 0x0b0c10, roughness: .5, envMapIntensity: .4 }),
+    HH_Key: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .6 }),
+    HH_Dark: new THREE.MeshStandardMaterial({ color: 0x111318, roughness: .65 }),
+    HH_Accent: new THREE.MeshBasicMaterial({ color: 0x42e3ff, toneMapped: false }),
+  };
+  const hcyan = new THREE.MeshBasicMaterial({ color: 0x42e3ff, toneMapped: false }), hpink = new THREE.MeshBasicMaterial({ color: 0xff4fd2, toneMapped: false });
+  const hrim = (o, mat, sx, sz) => { const r = new THREE.Mesh(o.geometry, mat.clone()); r.scale.set(sx, .7, sz); r.position.y = -.012; r.userData.rim = true; o.add(r); };
+  const hparts = []; device.traverse(o => { if (o.isMesh) hparts.push(o); });
+  for (const o of hparts) {
+    if (hm[o.material?.name]) o.material = hm[o.material.name].clone();  // 粒から形になるとき1つずつ透明度を変えるので、部品ごとに分ける
+    if (o.name === "HH_DpadBase") o.material = hm.HH_Body.clone();
+    if (o.name === "HH_DpadH") hrim(o, hcyan, 1.14, 1.5);
+    if (o.name === "HH_DpadV") hrim(o, hcyan, 1.5, 1.14);
+    if (/^HH_Btn\d$/.test(o.name)) hrim(o, hpink, 1.35, 1.35);
+  }
   device.traverse(o => {
     if (!o.isMesh) return;
     if (o.name === "HH_Screen") o.material = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false });
@@ -833,7 +1004,7 @@ if (canvas) (async () => {
   // 粒：ゲーム機の表面から点を拾い、ばらばらの位置から集まらせる
   scene.updateMatrixWorld(true);
   const N = small ? 1400 : 2600, target = new Float32Array(N * 3), from = new Float32Array(N * 3), delay = new Float32Array(N);
-  const meshes = []; device.traverse(o => { if (o.isMesh) meshes.push(o); });
+  const meshes = []; device.traverse(o => { if (o.isMesh && !o.userData.rim) meshes.push(o); });
   const body = meshes.find(m => m.name === "HH_Body") || meshes[0];
   const samplers = meshes.map(m => ({ m, s: new MeshSurfaceSampler(m).build(), w: m === body ? 6 : 1 }));
   const wsum = samplers.reduce((a, b) => a + b.w, 0), v = new THREE.Vector3(), inv = new THREE.Matrix4().copy(rig.matrixWorld).invert();
