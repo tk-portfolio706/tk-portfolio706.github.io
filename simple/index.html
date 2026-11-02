@@ -29,6 +29,10 @@
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--ink); font: 400 15px/1.9 var(--font); -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
+/* 日本語の改行：文節の切れ目で折り返し（Chrome・Edge の auto-phrase）、行頭に句読点や小さい字を置かず、最後の行に1〜2文字だけ残さない。社名・部署名は途中で折らない */
+body { word-break: auto-phrase; line-break: strict; }
+p, dd, li { text-wrap: pretty; }
+.nb { display: inline-block; white-space: nowrap; }
 .wrap { width: min(100% - var(--gut) * 2, var(--wrap)); margin-inline: auto; }
 .label { font: 500 11px/1.6 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 
@@ -91,7 +95,7 @@ a { color: inherit; }
 .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 40px; }
 .cols ul { list-style: none; padding: 0; color: #3d3f46; }
 .log { display: grid; gap: 24px; }
-.log div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 4px 24px; }
+.log > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 4px 24px; }
 .log time { font: 400 13px/1.9 var(--mono); color: var(--muted); }
 
 .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding: 32px 0 48px; font-size: 12px; color: var(--muted); }
@@ -104,7 +108,7 @@ a { color: inherit; }
 @media (max-width: 760px) {
   .work, .about { padding: 80px 0; }
   .work-head, .row { grid-template-columns: 1fr; }
-  .cols { grid-template-columns: 1fr; }
+  .cols, .log > div { grid-template-columns: 1fr; }
   .slide { flex-basis: 88%; gap: 24px; }
   .shot { aspect-ratio: 4 / 3; }
   .top nav { gap: 16px; }
@@ -127,7 +131,7 @@ a { color: inherit; }
     </h1>
     <div class="facts fade">
       <div><span class="label">Profile</span><p><a href="#about">わたしについて</a></p></div>
-      <div><span class="label">Now</span><p>株式会社アドウェイズ　ゲームマーケティング部門</p></div>
+      <div><span class="label">Now</span><p><span class="nb">株式会社アドウェイズ</span>　<span class="nb">Game Marketing Div.</span></p></div>
       <div><span class="label">Base</span><p>東京</p></div>
       <div><span class="label">Name</span><p>戸野 匠</p></div>
       <div><span class="label">Tags</span><p>#ENTJ　#有言実行　#コツコツタイプ</p></div>
@@ -222,7 +226,7 @@ a { color: inherit; }
       <div class="row fade">
         <span class="label">Career</span>
         <div class="log">
-          <div><time>2025.04〜</time><div><h3>株式会社アドウェイズ　ゲームマーケティング部門</h3><p>プランナー／コンサルタント。法人営業・企画・広告戦略の立案と実行。主にスマホゲームのデジタルプロモーション領域を担当し、広告運用と営業を兼任。直近、営業運用のハイブリッドなスキルを活かした提案実績が評価されベストルーキー賞を受賞。</p></div></div>
+          <div><time>2025.04〜</time><div><h3><span class="nb">株式会社アドウェイズ</span>　<span class="nb">Game Marketing Div.</span></h3><p>プランナー／コンサルタント。法人営業・企画・広告戦略の立案と実行。主にスマホゲームのデジタルプロモーション領域を担当し、広告運用と営業を兼任。直近、営業運用のハイブリッドなスキルを活かした提案実績が評価されベストルーキー賞を受賞。</p></div></div>
           <div><time>2025.03</time><div><h3>近畿大学 卒業</h3><p>卒業後、新卒で現在の会社に入社。</p></div></div>
           <div><time>2021.04</time><div><h3>近畿大学 入学</h3><p>大学時代は、一人でWebデザインのお仕事もしていました。</p></div></div>
         </div>

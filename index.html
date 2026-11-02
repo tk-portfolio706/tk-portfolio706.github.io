@@ -34,6 +34,10 @@
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.9 var(--font); letter-spacing: .03em; overflow-x: clip; }
 h1, h2, h3, p, dl, dd, ul, ol { margin: 0; }
 h1, h2, h3 { line-height: 1.4; text-wrap: balance; }
+/* 日本語の改行：文節の切れ目で折り返し（Chrome・Edge の auto-phrase）、行頭に句読点や小さい字を置かず、最後の行に1〜2文字だけ残さない。社名・部署名は途中で折らない */
+body { word-break: auto-phrase; line-break: strict; }
+p, dd, li { text-wrap: pretty; }
+.nb { display: inline-block; white-space: nowrap; }
 a { color: var(--accent-hi); }
 :focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 3px; }
 .mincho { font-family: var(--mincho); font-weight: 500; letter-spacing: .06em; }
@@ -417,7 +421,7 @@ html.locked, html.locked body { overflow: hidden; }
           <p class="hash">#ENTJ　#有言実行　#コツコツタイプ</p>
           <dl class="params">
             <dt>職業</dt><dd>ゲーム広告の運用・営業（プランナー／コンサルタント）</dd>
-            <dt>所属</dt><dd>株式会社アドウェイズ　ゲームマーケティング部門</dd>
+            <dt>所属</dt><dd><span class="nb">株式会社アドウェイズ</span>　<span class="nb">Game Marketing Div.</span></dd>
           </dl>
           <p class="lead">スマホゲームの広告運用と営業を両方担当しています。日本・北米・中南米・欧州への配信の設計から、クライアントへの説明までを1人でつなぎ、仕事のやり方そのものを仕組みにしています。</p>
           <ul class="tags" aria-label="得意なこと"><li>運用型広告</li><li>ROAS設計</li><li>グローバル配信</li><li>媒体交渉</li><li>アプリ計測</li><li>複数媒体の運用</li></ul>
@@ -502,7 +506,7 @@ html.locked, html.locked body { overflow: hidden; }
     <div class="win">
       <p class="win-t">経歴</p>
       <ol class="log">
-        <li><time>2025.04〜</time><div><h3>株式会社アドウェイズ　ゲームマーケティング部門</h3><p>プランナー／コンサルタント。法人営業・企画・広告戦略の立案と実行。主にスマホゲームのデジタルプロモーション領域を担当し、広告運用と営業を兼任。直近、営業運用のハイブリッドなスキルを活かした提案実績が評価されベストルーキー賞を受賞。</p></div></li>
+        <li><time>2025.04〜</time><div><h3><span class="nb">株式会社アドウェイズ</span>　<span class="nb">Game Marketing Div.</span></h3><p>プランナー／コンサルタント。法人営業・企画・広告戦略の立案と実行。主にスマホゲームのデジタルプロモーション領域を担当し、広告運用と営業を兼任。直近、営業運用のハイブリッドなスキルを活かした提案実績が評価されベストルーキー賞を受賞。</p></div></li>
         <li><time>2025.03</time><div><h3>近畿大学 卒業</h3><p>卒業後、新卒で現在の会社に入社。</p></div></li>
         <li><time>2021.04</time><div><h3>近畿大学 入学</h3><p>大学時代は、一人でWebデザインのお仕事もしていました。</p></div></li>
       </ol>
