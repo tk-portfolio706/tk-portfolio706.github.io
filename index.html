@@ -173,6 +173,7 @@ html.locked, html.locked body { overflow: hidden; }
 .chara-name { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 18px; }
 .chara-name b { font: 300 clamp(44px, 5vw, 72px)/1 var(--serif); }
 .chara-name span { font-size: 15px; }
+.hash { font-size: 13px; letter-spacing: .04em; color: var(--accent-hi); }  /* 性格のタグ（2026-11-02 たくみ） */
 .params { display: grid; grid-template-columns: max-content minmax(0, 1fr); border-top: 1px solid var(--line); }
 .params dt, .params dd { padding: 12px 0; border-bottom: 1px solid var(--line); }
 .params dt { font-size: 12px; color: var(--muted); padding-right: 24px; padding-top: 18px; }
@@ -251,7 +252,7 @@ html.locked, html.locked body { overflow: hidden; }
 .moves li { padding-left: 1.4em; position: relative; }
 .moves li::before { content: "◆"; position: absolute; left: 0; top: .35em; font-size: .6em; color: var(--accent-hi); }
 .moves p { color: var(--muted); }
-.gear { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; }
+.gear { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 32px; }
 .gear ul { list-style: none; padding: 0; display: grid; gap: 2px; }
 .log { list-style: none; padding: 0; display: grid; }
 .log li { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 8px 28px; padding: 18px 0; border-bottom: 1px solid var(--line); }
@@ -412,7 +413,8 @@ html.locked, html.locked body { overflow: hidden; }
       <div class="status">
         <div class="ph"><span class="avatar" aria-hidden="true">T</span><span class="ph-tag">仮：似顔絵</span></div>
         <div class="chara">
-          <div class="chara-name"><b>Tono Takumi</b></div>
+          <div class="chara-name"><b>Tono Takumi</b><span>戸野 匠</span></div>
+          <p class="hash">#ENTJ　#有言実行　#コツコツタイプ</p>
           <dl class="params">
             <dt>職業</dt><dd>ゲーム広告の運用・営業（プランナー／コンサルタント）</dd>
             <dt>所属</dt><dd>株式会社アドウェイズ　ゲームマーケティング部門</dd>
@@ -476,7 +478,7 @@ html.locked, html.locked body { overflow: hidden; }
           <div><h3>いま</h3><p>スマホゲームの広告で、配信の設計・運用と、クライアントへの提案・報告を1人で受け持っています。数字を見て配信の組み方を決め、それを相手にわかる言葉で説明するのが、いちばん得意な仕事です。</p></div>
           <div><h3>広告の仕事を選んだ理由</h3><p>アニメや漫画を、作る側ではなく「外から広める側」から見たかったからです。作品がどう見つけられ、どう遊ばれ、どう課金されるのかを、数字で追える場所として広告代理店を選びました。</p></div>
           <div><h3>大事にしていること</h3><p>あいまいな言い方をせず、言い切ること。うまい人のやり方をまず真似して、自分の型にすること。一度やったことは、次の人が使える形に残すこと。</p></div>
-          <dl class="facts"><dt>拠点</dt><dd>東京</dd><dt>好きなもの</dt><dd>アニメ・漫画、絵を描くこと</dd></dl>
+          <dl class="facts"><dt>拠点</dt><dd>東京</dd><dt>好きなこと</dt><dd>古着屋・美術館・展示会巡り、漫画・アニメ鑑賞、絵を描くこと</dd></dl>
         </div>
       </div>
       <div class="win">
@@ -494,13 +496,15 @@ html.locked, html.locked body { overflow: hidden; }
         <div><h3>広告運用</h3><ul><li>Google 広告（アプリキャンペーン）</li><li>Meta・X・TikTok・Apple Ads</li><li>UNICORN・Zucks などの DSP／アドネットワーク</li><li>ROAS・ARPU を軸にした配信設計</li><li>グローバル・多言語の配信</li></ul></div>
         <div><h3>分析・計測</h3><ul><li>GA4・Firebase 連携</li><li>タグ・トリガーの設計</li><li>Excel での分析の型づくり</li></ul></div>
         <div><h3>営業</h3><ul><li>クライアントへの定例報告</li><li>媒体との交渉</li><li>ガントチャートでの段取り</li></ul></div>
+        <div><h3>デザイン</h3><ul><li>Web・UI/UX Design（STUDIO・Figma）</li><li>Graphic Design（Illustrator・Photoshop）</li><li>Illustration（Procreate・CLIP STUDIO PAINT）</li></ul></div>
       </div>
     </div>
     <div class="win">
       <p class="win-t">経歴</p>
       <ol class="log">
         <li><time>2025.04〜</time><div><h3>株式会社アドウェイズ　ゲームマーケティング部門</h3><p>営業（プランナー／コンサルタント）。法人営業・営業企画・広告戦略の立案と実行。ゲーム会社5社のスマホゲームを担当し、広告運用と営業を兼任。日本・北米・中南米・欧州への配信の設計、クライアント対応、後輩への引き継ぎも担当。ベストルーキー賞を受賞。</p></div></li>
-        <li><time>2025.03</time><div><h3>大学卒業</h3><p>卒業後、新卒で現在の会社に入社。</p></div></li>
+        <li><time>2025.03</time><div><h3>近畿大学 卒業</h3><p>卒業後、新卒で現在の会社に入社。</p></div></li>
+        <li><time>2021.04</time><div><h3>近畿大学 入学</h3><p>大学時代は、一人でWebデザインのお仕事もしていました。</p></div></li>
       </ol>
     </div>
   </section>
