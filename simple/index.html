@@ -51,19 +51,35 @@ a { color: inherit; }
 .facts a { text-underline-offset: 4px; }
 .hint { margin-top: 12px; }
 
-/* 仕事：1件ごとに、左は年と札、右は題と説明。下に大きな画像の枠 */
+/* 仕事：横に送って1件ずつ見るカルーセル。ライブラリは使わず、CSS の scroll-snap ＋ 数行の script（前後のボタンと番号） */
 .work { padding: 120px 0; border-top: 1px solid var(--line); }
-.work-head { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 3fr); gap: 32px 56px; }
-.work-side { display: grid; gap: 22px; align-content: start; }
-.year { font: 400 clamp(20px, 1.8vw, 26px)/1.3 var(--mono); color: var(--accent); }
+.work-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.ctrl { display: flex; align-items: center; gap: 10px; }
+.count { font: 400 13px/1 var(--mono); color: var(--muted); margin-right: 10px; }
+.count b { font-weight: 500; color: var(--accent); }
+.ctrl button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--accent);
+  font: 400 16px/1 var(--mono); cursor: pointer; transition: background .2s, opacity .2s; }
+.ctrl button:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.ctrl button:disabled { opacity: .3; cursor: default; }
+/* 左端は本文の端にそろえ、右は画面の端まで流して次の1件を少しのぞかせる */
+.track { --edge: max(var(--gut), (100% - var(--wrap)) / 2); list-style: none; display: flex; gap: clamp(20px, 3vw, 40px);
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; overscroll-behavior-x: contain;
+  padding: 0 var(--edge) 8px; scroll-padding-inline: var(--edge); scrollbar-width: none; }
+.track::-webkit-scrollbar { display: none; }
+.track:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.slide { flex: 0 0 min(86%, 1000px); scroll-snap-align: start; display: grid; gap: 36px; }
+.work-head { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 3fr); gap: 24px 48px; }
+.work-side { display: grid; gap: 18px; align-content: start; }
+.year { font: 400 clamp(18px, 1.6vw, 22px)/1.3 var(--mono); color: var(--accent); }
 .tags { list-style: none; padding: 0; display: grid; gap: 2px; }
 .tags li { font: 400 11px/1.8 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); opacity: .8; }
-.work h2 { font: 500 clamp(22px, 2vw, 28px)/1.3 var(--mono); color: var(--accent); }
-.work .catch { font: 500 clamp(24px, 3vw, 42px)/1.45 var(--font); color: var(--accent); margin-top: 6px; letter-spacing: .01em; }
-.work .body { color: color-mix(in srgb, var(--accent) 80%, var(--ink)); max-width: 42em; margin-top: 22px; }
-.shot { margin-top: 64px; aspect-ratio: 16 / 9; border-radius: 14px; background: color-mix(in srgb, var(--accent) 10%, #fff);
+.work h2 { font: 500 clamp(20px, 1.8vw, 24px)/1.3 var(--mono); color: var(--accent); }
+.work .catch { font: 500 clamp(22px, 2.4vw, 34px)/1.45 var(--font); color: var(--accent); margin-top: 6px; letter-spacing: .01em; }
+.work .body { color: color-mix(in srgb, var(--accent) 80%, var(--ink)); max-width: 42em; margin-top: 16px; }
+.shot { aspect-ratio: 16 / 9; border-radius: 14px; background: color-mix(in srgb, var(--accent) 10%, #fff);
   display: grid; place-items: end start; padding: 18px; }
 .shot span { font: 400 11px/1 var(--mono); letter-spacing: .1em; color: var(--accent); opacity: .7; }
+@media (prefers-reduced-motion: reduce) { .track { scroll-behavior: auto; } }
 
 /* わたしについて：見出しを左、中身を右に置いた行を重ねる */
 .about { padding: 120px 0 80px; border-top: 1px solid var(--line); }
@@ -89,7 +105,8 @@ a { color: inherit; }
   .work, .about { padding: 80px 0; }
   .work-head, .row { grid-template-columns: 1fr; }
   .cols { grid-template-columns: 1fr; }
-  .shot { margin-top: 40px; aspect-ratio: 4 / 3; }
+  .slide { flex-basis: 88%; gap: 24px; }
+  .shot { aspect-ratio: 4 / 3; }
   .top nav { gap: 16px; }
 }
 </style>
@@ -118,63 +135,61 @@ a { color: inherit; }
     <p class="label hint fade">↓ スクロールして仕事を見る</p>
   </section>
 
-  <!-- 仕事は仮（ゲーム風の版と同じ6件）。画像と文は本物ができたら差し替える -->
-  <div id="work">
-    <section class="work">
-      <div class="wrap">
-        <div class="work-head fade">
-          <div class="work-side"><span class="year">2025</span><ul class="tags"><li>配信設計</li><li>グローバル配信</li></ul></div>
-          <div><h2>Quality / Volume</h2><p class="catch">配信国を質と量に分けたキャンペーン設計</p></div>
-        </div>
-        <div class="shot fade"><span>仮の画像</span></div>
+  <!-- 仕事はダミー（2026-11-02 たくみ「仮のものは全てなくしてダミーテキストを」「カルーセルのような構造に」）。本物ができたら差し替える -->
+  <section class="work" id="work" aria-roledescription="カルーセル" aria-label="仕事">
+    <div class="wrap work-bar fade">
+      <span class="label">Work</span>
+      <div class="ctrl">
+        <span class="count" aria-live="polite"><b>01</b> / 06</span>
+        <button type="button" class="prev" aria-label="前の仕事">←</button>
+        <button type="button" class="next" aria-label="次の仕事">→</button>
       </div>
-    </section>
-    <section class="work">
-      <div class="wrap">
-        <div class="work-head fade">
-          <div class="work-side"><span class="year">2025</span><ul class="tags"><li>計測設計</li><li>アプリ計測</li></ul></div>
-          <div><h2>Measurement</h2><p class="catch">アプリの計測をつなぐ設計と説明資料</p></div>
-        </div>
-        <div class="shot fade"><span>仮の画像</span></div>
-      </div>
-    </section>
-    <section class="work">
-      <div class="wrap">
-        <div class="work-head fade">
-          <div class="work-side"><span class="year">2025</span><ul class="tags"><li>仕組み化</li></ul></div>
-          <div><h2>Handover</h2><p class="catch">判断を言葉にした引き継ぎの型</p></div>
-        </div>
-        <div class="shot fade"><span>仮の画像</span></div>
-      </div>
-    </section>
-    <section class="work">
-      <div class="wrap">
-        <div class="work-head fade">
-          <div class="work-side"><span class="year">2025</span><ul class="tags"><li>クリエイティブ</li></ul></div>
-          <div><h2>Creative Review</h2><p class="catch">国ごとの広告クリエイティブの見直し</p></div>
-        </div>
-        <div class="shot fade"><span>仮の画像</span></div>
-      </div>
-    </section>
-    <section class="work">
-      <div class="wrap">
-        <div class="work-head fade">
-          <div class="work-side"><span class="year">2025</span><ul class="tags"><li>提案資料</li></ul></div>
-          <div><h2>Proposal</h2><p class="catch">新しいタイトルの配信の提案</p></div>
-        </div>
-        <div class="shot fade"><span>仮の画像</span></div>
-      </div>
-    </section>
-    <section class="work">
-      <div class="wrap">
-        <div class="work-head fade">
-          <div class="work-side"><span class="year">2025</span><ul class="tags"><li>レポート</li></ul></div>
-          <div><h2>Weekly Report</h2><p class="catch">数字を貼るだけで差分が見える定例レポート</p></div>
-        </div>
-        <div class="shot fade"><span>仮の画像</span></div>
-      </div>
-    </section>
-  </div>
+    </div>
+    <ul class="track fade" tabindex="0" aria-label="仕事の一覧（左右にスクロール）">
+        <li class="slide" aria-roledescription="スライド" aria-label="1 / 6">
+          <div class="shot"><span>画像が入ります</span></div>
+          <div class="work-head">
+            <div class="work-side"><span class="year">20XX</span><ul class="tags"><li>Category</li></ul></div>
+            <div><h2>Project Title 01</h2><p class="catch">ここに作品の題が入ります</p><p class="body">ここに作品の説明が入ります。これはダミーテキストです。</p></div>
+          </div>
+        </li>
+        <li class="slide" aria-roledescription="スライド" aria-label="2 / 6">
+          <div class="shot"><span>画像が入ります</span></div>
+          <div class="work-head">
+            <div class="work-side"><span class="year">20XX</span><ul class="tags"><li>Category</li></ul></div>
+            <div><h2>Project Title 02</h2><p class="catch">ここに作品の題が入ります</p><p class="body">ここに作品の説明が入ります。これはダミーテキストです。</p></div>
+          </div>
+        </li>
+        <li class="slide" aria-roledescription="スライド" aria-label="3 / 6">
+          <div class="shot"><span>画像が入ります</span></div>
+          <div class="work-head">
+            <div class="work-side"><span class="year">20XX</span><ul class="tags"><li>Category</li></ul></div>
+            <div><h2>Project Title 03</h2><p class="catch">ここに作品の題が入ります</p><p class="body">ここに作品の説明が入ります。これはダミーテキストです。</p></div>
+          </div>
+        </li>
+        <li class="slide" aria-roledescription="スライド" aria-label="4 / 6">
+          <div class="shot"><span>画像が入ります</span></div>
+          <div class="work-head">
+            <div class="work-side"><span class="year">20XX</span><ul class="tags"><li>Category</li></ul></div>
+            <div><h2>Project Title 04</h2><p class="catch">ここに作品の題が入ります</p><p class="body">ここに作品の説明が入ります。これはダミーテキストです。</p></div>
+          </div>
+        </li>
+        <li class="slide" aria-roledescription="スライド" aria-label="5 / 6">
+          <div class="shot"><span>画像が入ります</span></div>
+          <div class="work-head">
+            <div class="work-side"><span class="year">20XX</span><ul class="tags"><li>Category</li></ul></div>
+            <div><h2>Project Title 05</h2><p class="catch">ここに作品の題が入ります</p><p class="body">ここに作品の説明が入ります。これはダミーテキストです。</p></div>
+          </div>
+        </li>
+        <li class="slide" aria-roledescription="スライド" aria-label="6 / 6">
+          <div class="shot"><span>画像が入ります</span></div>
+          <div class="work-head">
+            <div class="work-side"><span class="year">20XX</span><ul class="tags"><li>Category</li></ul></div>
+            <div><h2>Project Title 06</h2><p class="catch">ここに作品の題が入ります</p><p class="body">ここに作品の説明が入ります。これはダミーテキストです。</p></div>
+          </div>
+        </li>
+    </ul>
+  </section>
 
   <section class="about" id="about">
     <div class="wrap">
@@ -219,6 +234,35 @@ a { color: inherit; }
 <footer class="wrap foot"><span>担当タイトル名と社外秘の数字は伏せています</span><span>© 2026 Tono Takumi</span></footer>
 
 <script>
+// 仕事のカルーセル：前後のボタンで1件ずつ送り、いま何件目かを出す
+(() => {
+  const track = document.querySelector(".track");
+  if (!track) return;
+  const slides = [...track.children], count = document.querySelector(".count b");
+  const prev = document.querySelector(".prev"), next = document.querySelector(".next");
+  const pad = () => parseFloat(getComputedStyle(track).scrollPaddingLeft) || 0;
+  const now = () => {
+    const x = track.scrollLeft;
+    let best = 0;
+    slides.forEach((s, i) => { if (Math.abs(s.offsetLeft - pad() - x) < Math.abs(slides[best].offsetLeft - pad() - x)) best = i; });
+    return best;
+  };
+  const go = i => track.scrollTo({ left: slides[Math.max(0, Math.min(slides.length - 1, i))].offsetLeft - pad() });
+  const sync = () => {
+    const i = now(), end = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    count.textContent = String(end ? slides.length : i + 1).padStart(2, "0");
+    prev.disabled = track.scrollLeft <= 2; next.disabled = end;
+  };
+  prev.addEventListener("click", () => go(now() - 1));
+  next.addEventListener("click", () => go(now() + 1));
+  track.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); go(now() + (e.key === "ArrowRight" ? 1 : -1)); }
+  });
+  let t; track.addEventListener("scroll", () => { cancelAnimationFrame(t); t = requestAnimationFrame(sync); }, { passive: true });
+  addEventListener("resize", sync);
+  sync();
+})();
+
 // 見えてきたものをうっすら出す
 (() => {
   const fades = document.querySelectorAll(".fade");
