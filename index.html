@@ -291,7 +291,7 @@ html.locked, html.locked body { overflow: hidden; }
 /* 群青のひし形（2026-11-02 たくみ「Blender で作った3Dを入れたい」→「群青のひし形」）。three.js r186 で描く（審査済み：30_Notes/インストール審査ログ）。
    右側にゆっくり浮かんで回り、スクロールでも回り、マウス・指の方へ少し傾く。窓は少し透けるので、後ろに見える。
    形は Blender で作った gem.glb（元は gem.blend）。読み込めないときは three.js で近い形を描く */
-.gem { position: absolute; right: max(-6vw, calc((100vw - var(--wrap)) / 2 - 20vw)); top: 42%; translate: 0 -50%; width: min(30vw, 480px); aspect-ratio: 1; }
+.gem { position: absolute; right: max(-8vw, calc((100vw - var(--wrap)) / 2 - 24vw)); top: 42%; translate: 0 -50%; width: min(38vw, 620px); aspect-ratio: 1; }
 /* ゲームのコントローラー（2026-11-02 たくみ「コントローラーも作って」）。Blender で作った controller.glb。左下の余白に、ひし形と向かい合うように */
 .pad { position: absolute; left: max(-3vw, calc((100vw - var(--wrap)) / 2 - 14vw)); top: 80%; translate: 0 -50%; width: min(28vw, 440px); aspect-ratio: 1; }
 
@@ -614,33 +614,64 @@ const glowTex = (() => {
   r.addColorStop(0, "rgba(160,190,255,.9)"); r.addColorStop(.25, "rgba(90,130,255,.45)"); r.addColorStop(.6, "rgba(46,69,163,.15)"); r.addColorStop(1, "rgba(46,69,163,0)");
   g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
 })();
-const dressCrystal = (root, group) => {
-  // Cycles で描いたときの見た目に近づける：透けて奥が屈折するガラス、内側で群青を吸って奥ほど濃く、中心に光る芯
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transmission: 1, thickness: .9, ior: 1.55, dispersion: 2,
-    attenuationColor: 0x6f8cff, attenuationDistance: 1.5, clearcoat: .4, clearcoatRoughness: .04, specularIntensity: 1, envMapIntensity: 2.2,
-    iridescence: .35, iridescenceIOR: 1.3, flatShading: true });
-  const core = new THREE.MeshBasicMaterial({ color: 0x5f86ff });
-  const meshes = []; root.traverse(o => { if (o.isMesh) meshes.push(o); });
-  const big = meshes.reduce((a, b) => (b.geometry.boundingSphere || (b.geometry.computeBoundingSphere(), b.geometry.boundingSphere)).radius >
-    (a.geometry.boundingSphere || (a.geometry.computeBoundingSphere(), a.geometry.boundingSphere)).radius ? b : a, meshes[0]);
-  for (const o of meshes) o.material = glass;
-  if (big) { const inner = new THREE.Mesh(big.geometry, core); inner.scale.set(.1, .62, .1); big.add(inner); }  // いちばん大きい結晶の中だけに、細い光の芯
-  // うしろの光のにじみ（明るさは変えない。点滅すると目が疲れるため）
-  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: .8 }));
-  halo.scale.set(7, 8, 1); halo.position.z = -1; group.add(halo);
-  return { halo };
+// クリスタル：下のとげとげはなくし、上下がとがった一つの結晶にする。まわりに大中小の結晶と小さな粒をちりばめる（2026-11-02 たくみ）
+// 形は六角柱の上下をとがらせたもの（回転体を6面で作る）
+const crystalGeo = (() => {
+  const g = new THREE.LatheGeometry([new THREE.Vector2(0, -1.55), new THREE.Vector2(.56, -.7), new THREE.Vector2(.56, .7), new THREE.Vector2(0, 1.65)], 6);
+  g.computeVertexNormals(); return g;
+})();
+const buildCrystals = group => {
+  // 透けて奥が屈折するガラス、うすい群青の吸収、虹色の照り
+  // 半分透ける群青のガラス。面ごとに映り込みが変わり、カットした宝石のように見える
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0x5677e8, metalness: .15, roughness: .06, transmission: .55, thickness: 1, ior: 1.6,
+    attenuationColor: 0x3f5fd8, attenuationDistance: 1.2, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 2.6,
+    emissive: 0x16246e, emissiveIntensity: .5, iridescence: .4, iridescenceIOR: 1.3, flatShading: true });
+  // まわりの結晶は少し色を濃くして、主役と見分ける
+  const glass2 = glass.clone(); glass2.color.set(0x4566d8); glass2.transmission = .4;
+  const main = new THREE.Mesh(crystalGeo, glass);
+  const core = new THREE.Mesh(crystalGeo, new THREE.MeshBasicMaterial({ color: 0x5f86ff })); core.scale.set(.12, .6, .12); main.add(core);  // 中心の細い光の芯
+  main.scale.setScalar(.82);
+  group.add(main);  // 動きの処理は、最初の子を主役として回す
+  // 大中小の結晶：主役のまわりに、奥行きを変えて浮かべる（[大きさ, x, y, z, 傾き]）
+  const spots = [[.36, -1.45, .9, -.6, .5], [.3, 1.35, -1.0, -.3, -.6], [.2, 1.15, 1.3, .4, .3], [.16, -1.25, -1.25, .5, -.4],
+                 [.11, -.8, 1.7, .2, .8], [.09, 1.65, .25, -.8, -.2], [.08, -1.75, -.15, .3, .9], [.06, .7, -1.8, .6, .4]];
+  const sats = spots.map(([k, x, y, z, tilt], n) => {
+    const m = new THREE.Mesh(crystalGeo, glass2);
+    m.scale.setScalar(k); m.position.set(x, y, z); m.rotation.z = tilt;
+    group.add(m);
+    return { m, y, speed: .25 + n * .05, phase: n * 1.3 };
+  });
+  // うしろの白っぽい光のにじみは付けない（2026-11-02 たくみ「周りが白くなるものもやめて」）
+  // 小さな粒：ゆっくり回るだけで、明るさは一定（点滅しない）
+  const n = 90, pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { const r = 1 + Math.random() * 1.2, a = Math.random() * Math.PI * 2; pos.set([Math.cos(a) * r, (Math.random() - .5) * 4, Math.sin(a) * r * .6], i * 3); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const dust = new THREE.Points(geo, new THREE.PointsMaterial({ map: glowTex, color: 0xa9bcff, size: .16, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false }));
+  group.add(dust);
+  return { sats, dust };
 };
 
-// コントローラー：群青の樹脂にクリアのコート、白いボタンにもつや、中央の小さな部品はうっすら光る（Cycles で描いたときと同じ考え方）
+// コントローラー：つや消しの黒い本体に、十字キーは水色、ボタンはピンクの光る縁（2026-11-02 たくみの参考画像の雰囲気。絵や形は写さない）
 const dressPad = root => {
   const mats = {
-    Pad2_Body: new THREE.MeshPhysicalMaterial({ color: 0x23379c, roughness: .38, metalness: 0, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: 1.2 }),
-    Pad2_Key: new THREE.MeshPhysicalMaterial({ color: 0xe6e9f5, roughness: .25, clearcoat: 1, clearcoatRoughness: .05 }),
-    Pad2_Dark: new THREE.MeshPhysicalMaterial({ color: 0x0b0d14, roughness: .3, clearcoat: .5, clearcoatRoughness: .1 }),
-    Pad2_Stick: new THREE.MeshStandardMaterial({ color: 0x0a0c12, roughness: .7 }),
-    Pad2_Accent: new THREE.MeshStandardMaterial({ color: 0x6f8cff, emissive: 0x6f8cff, emissiveIntensity: 1.2, roughness: .25 }),
+    Pad2_Body: new THREE.MeshPhysicalMaterial({ color: 0x1b1e26, roughness: .62, metalness: 0, clearcoat: .15, clearcoatRoughness: .5, envMapIntensity: .8 }),
+    Pad2_Key: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .45 }),
+    Pad2_Dark: new THREE.MeshStandardMaterial({ color: 0x13151b, roughness: .5 }),
+    Pad2_Stick: new THREE.MeshStandardMaterial({ color: 0x2a2f3a, roughness: .5 }),
+    Pad2_Accent: new THREE.MeshStandardMaterial({ color: 0x15171d, roughness: .45 }),
   };
-  root.traverse(o => { if (o.isMesh && mats[o.material?.name]) o.material = mats[o.material.name]; });
+  // 光る縁：部品を少し大きく写して、少し下に置く（上に乗る部品のまわりだけが縁として見える）。明るさは一定（点滅しない）
+  const cyan = new THREE.MeshBasicMaterial({ color: 0x42e3ff, toneMapped: false });
+  const pink = new THREE.MeshBasicMaterial({ color: 0xff4fd2, toneMapped: false });
+  const rim = (o, mat, sx, sz) => { const g = new THREE.Mesh(o.geometry, mat); g.scale.set(sx, .7, sz); g.position.y = -.012; o.add(g); };
+  const parts = []; root.traverse(o => { if (o.isMesh) parts.push(o); });
+  for (const o of parts) {
+    if (mats[o.material?.name]) o.material = mats[o.material.name];
+    if (o.name === "Pad2_DpadBase") o.material = mats.Pad2_Body;  // 十字キーの下の円は本体と同じ色にして目立たせない
+    if (o.name === "Pad2_DpadH") rim(o, cyan, 1.14, 1.5);
+    if (o.name === "Pad2_DpadV") rim(o, cyan, 1.5, 1.14);
+    if (/^Pad2_Btn\d$/.test(o.name)) rim(o, pink, 1.38, 1.38);
+  }
 };
 
 document.querySelectorAll("canvas.m3d").forEach(canvas => {
@@ -669,6 +700,7 @@ document.querySelectorAll("canvas.m3d").forEach(canvas => {
   views.push(view);
 
   const put = obj => {
+    if (kind === "gem") { view.fx = buildCrystals(group); view.draw(); return; }  // クリスタルはページ側で形を作る（Blender の群れの形は使わない）
     // 大きさをそろえて真ん中に置く（コントローラーは横長なので幅で合わせる）
     const box = new THREE.Box3().setFromObject(obj), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
     obj.position.sub(center);
@@ -677,7 +709,6 @@ document.querySelectorAll("canvas.m3d").forEach(canvas => {
     obj.position.multiplyScalar(s);
     group.add(obj);
     if (kind === "pad") group.rotation.set(1.05, .25, 0);  // ボタンのある面がこちらを向くように（止まっているときも）
-    if (kind === "gem") view.fx = dressCrystal(obj, group);
     if (kind === "pad") dressPad(obj);
     view.draw();
   };
@@ -712,6 +743,9 @@ if (!still && views.length) {
         // クリスタルは傾きを小さく保ったまま縦の軸で回る（光の明滅はしない）
         const crystal = g.children.find(c => !c.isSprite && !c.isPoints);
         if (crystal) crystal.rotation.y = t * .35 + sy * .9;
+        // まわりの結晶はそれぞれの速さで回りながら、ゆっくり上下に漂う。粒の輪はゆっくり回る
+        for (const c of v.fx?.sats || []) { c.m.rotation.y = t * c.speed + c.phase; c.m.position.y = c.y + Math.sin(t * .6 + c.phase) * .08; }
+        if (v.fx?.dust) v.fx.dust.rotation.y = t * .05;
         g.rotation.x += (py * .25 - g.rotation.x) * .05;
         g.rotation.z += (-px * .2 + .12 - g.rotation.z) * .05;
         g.position.y = Math.sin(t * .8) * .12;
