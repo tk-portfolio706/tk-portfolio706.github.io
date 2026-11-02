@@ -296,6 +296,11 @@ html.locked, html.locked body { overflow: hidden; }
 .scatter { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* ゲームのコントローラー（2026-11-02 たくみ「コントローラーも作って」）。Blender で作った controller.glb。左下の余白に、ひし形と向かい合うように */
 .pad { position: absolute; left: max(-3vw, calc((100vw - var(--wrap)) / 2 - 14vw)); top: 80%; translate: 0 -50%; width: min(28vw, 440px); aspect-ratio: 1; }
+/* コントローラーは、たくみが用意したモデルを Blender の Cycles で黒×ネオンに描いた1枚の絵（2026-11-02 たくみ「PS5で進める」）。ロゴと文字は消してある。
+   ライセンスの都合で 3D のファイルは置かず、絵だけを置く。ゆっくり浮かんで少し傾く（点滅や切り替えはしない） */
+.pad-img { aspect-ratio: auto; height: auto; object-fit: contain; animation: pad-float 9s ease-in-out infinite; }
+@keyframes pad-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-14px) rotate(1.5deg); } }
+@media (prefers-reduced-motion: reduce) { .pad-img { animation: none; } }
 
 @media (max-width: 899px) {
   .gem { right: 50%; translate: 50% 0; top: 10vh; width: min(72vw, 380px); opacity: .6; }
@@ -342,7 +347,7 @@ html.locked, html.locked body { overflow: hidden; }
   <div class="smoke"><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow pointer"><i></i></span></div>
   <canvas class="scatter"></canvas>
   <canvas class="gem m3d" data-model="gem.glb" data-kind="gem"></canvas>
-  <canvas class="pad m3d" data-kind="pad"></canvas>
+  <img class="pad pad-img" src="ps5/pad_ps5.webp" alt="" aria-hidden="true">
   <div class="deco">
     <span class="d-ring" style="--x:5%;--y:18%;--r:140px;--k:30;--o:.55"></span>
     <span class="d-cross" style="--x:93%;--y:14%;--k:50"></span>
