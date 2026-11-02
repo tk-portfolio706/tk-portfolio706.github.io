@@ -301,10 +301,14 @@ html.locked, html.locked body { overflow: hidden; }
 .pad-img { aspect-ratio: auto; height: auto; object-fit: contain; animation: pad-float 9s ease-in-out infinite; }
 @keyframes pad-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-14px) rotate(1.5deg); } }
 @media (prefers-reduced-motion: reduce) { .pad-img { animation: none; } }
+/* 携帯ゲーム機（2026-11-02 たくみ「これも追加して」）。たくみが用意した Switch のモデルを、PS5 と同じ黒×ネオンで描いた1枚の絵（switch/switch.webp）。
+   ボタンの文字とロゴは消してある。右下で、左下のコントローラーと向かい合う。少しずらした周期で浮かぶ */
+.switch-img { position: absolute; right: max(2vw, calc((100vw - var(--wrap)) / 2 - 10vw)); top: 84%; translate: 0 -50%; width: min(24vw, 380px); height: auto; animation: pad-float 11s ease-in-out -4s infinite reverse; }
+@media (prefers-reduced-motion: reduce) { .switch-img { animation: none; } }
 
 @media (max-width: 899px) {
   .gem { right: 50%; translate: 50% 0; top: 10vh; width: min(72vw, 380px); opacity: .6; }
-  .pad { display: none; }
+  .pad, .switch-img { display: none; }
   .deco > :nth-child(n+7) { display: none; }  /* 狭い画面では飾りを6つに減らす */
   .deco { opacity: .6; }
   .main { gap: 72px; padding-top: 56px; }
@@ -348,6 +352,7 @@ html.locked, html.locked body { overflow: hidden; }
   <canvas class="scatter"></canvas>
   <canvas class="gem m3d" data-model="gem.glb" data-kind="gem"></canvas>
   <img class="pad pad-img" src="ps5/pad_ps5.webp" alt="" aria-hidden="true">
+  <img class="switch-img" src="switch/switch.webp" alt="" aria-hidden="true">
   <div class="deco">
     <span class="d-ring" style="--x:5%;--y:18%;--r:140px;--k:30;--o:.55"></span>
     <span class="d-cross" style="--x:93%;--y:14%;--k:50"></span>
