@@ -12,8 +12,8 @@
 <!--
   シンプル版（2026-11-02 たくみ「今のスタイルとは別バージョンとして、かなりシンプルなものも」）。
   参考にしたのは、たくみが挙げたサイトの「構成の考え方」だけ：白に近い地、上に小さな名前、余白の中に1〜2行の自己紹介、
-  作品ごとに左は年と小さな札、右は大きな題と説明、作品ごとに背景が淡い色へ切り替わる。絵・文・コードは写していない。
-  作り方は GitHub の候補を比べて「HTML 1枚・ライブラリなし」にした。動きは背景色の切り替えと、うっすら現れるだけ
+  作品ごとに左は年と小さな札、右は大きな題と説明。絵・文・コードは写していない。背景の色が切り替わる演出は、たくみ「不要」でやめた。
+  作り方は GitHub の候補を比べて「HTML 1枚・ライブラリなし」にした。動きはうっすら現れるだけ
 -->
 <style>
 :root {
@@ -27,8 +27,7 @@
 }
 * { box-sizing: border-box; margin: 0; }
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font: 400 15px/1.9 var(--font); -webkit-font-smoothing: antialiased;
-  transition: background-color .8s ease; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.9 var(--font); -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
 .wrap { width: min(100% - var(--gut) * 2, var(--wrap)); margin-inline: auto; }
 .label { font: 500 11px/1.6 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
@@ -84,7 +83,7 @@ a { color: inherit; }
 /* うっすら現れる：読み込んだときは全部見えている。画面の下にあるものだけ、スクリプトが一度隠して、見えてきたら出す（動きを減らす設定のときは何もしない） */
 .fade { transition: opacity .9s ease, translate .9s ease; }
 .fade.wait { opacity: 0; translate: 0 16px; }
-@media (prefers-reduced-motion: reduce) { .fade { transition: none; } body { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .fade { transition: none; } }
 
 @media (max-width: 760px) {
   .work, .about { padding: 80px 0; }
@@ -119,9 +118,9 @@ a { color: inherit; }
     <p class="label hint fade">↓ スクロールして仕事を見る</p>
   </section>
 
-  <!-- 仕事は仮（ゲーム風の版と同じ6件）。画像と文は本物ができたら差し替える。data-tint は、その仕事を見ているときの背景の色 -->
+  <!-- 仕事は仮（ゲーム風の版と同じ6件）。画像と文は本物ができたら差し替える -->
   <div id="work">
-    <section class="work" data-tint="#eef1fb">
+    <section class="work">
       <div class="wrap">
         <div class="work-head fade">
           <div class="work-side"><span class="year">2025</span><ul class="tags"><li>配信設計</li><li>グローバル配信</li></ul></div>
@@ -130,7 +129,7 @@ a { color: inherit; }
         <div class="shot fade"><span>仮の画像</span></div>
       </div>
     </section>
-    <section class="work" data-tint="#f2effb">
+    <section class="work">
       <div class="wrap">
         <div class="work-head fade">
           <div class="work-side"><span class="year">2025</span><ul class="tags"><li>計測設計</li><li>アプリ計測</li></ul></div>
@@ -139,7 +138,7 @@ a { color: inherit; }
         <div class="shot fade"><span>仮の画像</span></div>
       </div>
     </section>
-    <section class="work" data-tint="#edf4f6">
+    <section class="work">
       <div class="wrap">
         <div class="work-head fade">
           <div class="work-side"><span class="year">2025</span><ul class="tags"><li>仕組み化</li></ul></div>
@@ -148,7 +147,7 @@ a { color: inherit; }
         <div class="shot fade"><span>仮の画像</span></div>
       </div>
     </section>
-    <section class="work" data-tint="#f6eff6">
+    <section class="work">
       <div class="wrap">
         <div class="work-head fade">
           <div class="work-side"><span class="year">2025</span><ul class="tags"><li>クリエイティブ</li></ul></div>
@@ -157,7 +156,7 @@ a { color: inherit; }
         <div class="shot fade"><span>仮の画像</span></div>
       </div>
     </section>
-    <section class="work" data-tint="#eef1fb">
+    <section class="work">
       <div class="wrap">
         <div class="work-head fade">
           <div class="work-side"><span class="year">2025</span><ul class="tags"><li>提案資料</li></ul></div>
@@ -166,7 +165,7 @@ a { color: inherit; }
         <div class="shot fade"><span>仮の画像</span></div>
       </div>
     </section>
-    <section class="work" data-tint="#f2effb">
+    <section class="work">
       <div class="wrap">
         <div class="work-head fade">
           <div class="work-side"><span class="year">2025</span><ul class="tags"><li>レポート</li></ul></div>
@@ -177,7 +176,7 @@ a { color: inherit; }
     </section>
   </div>
 
-  <section class="about" id="about" data-tint="#faf9f7">
+  <section class="about" id="about">
     <div class="wrap">
       <div class="row fade">
         <span class="label">About</span>
@@ -220,20 +219,14 @@ a { color: inherit; }
 <footer class="wrap foot"><span>担当タイトル名と社外秘の数字は伏せています</span><span>© 2026 Tono Takumi</span></footer>
 
 <script>
-// 見えてきたものをうっすら出す。仕事の区切りが画面の真ん中に来たら、背景をその仕事の淡い色にする
+// 見えてきたものをうっすら出す
 (() => {
   const fades = document.querySelectorAll(".fade");
-  const tints = document.querySelectorAll("[data-tint]");
   if (!("IntersectionObserver" in window)) return;
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove("wait"); io.unobserve(e.target); } }), { threshold: .12 });
     fades.forEach(e => { if (e.getBoundingClientRect().top > innerHeight) { e.classList.add("wait"); io.observe(e); } });
   }
-  const base = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
-  const tio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) document.body.style.backgroundColor = e.target.dataset.tint; }), { rootMargin: "-50% 0px -50% 0px" });
-  tints.forEach(e => tio.observe(e));
-  // はじめの画面に戻ったら、元の色に戻す
-  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) document.body.style.backgroundColor = base; }), { rootMargin: "-50% 0px -50% 0px" }).observe(document.querySelector(".hero"));
 })();
 </script>
 </body>
