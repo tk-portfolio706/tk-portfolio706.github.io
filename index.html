@@ -63,8 +63,15 @@ a { color: var(--accent-hi); }
 /* 画面の端を少し暗く */
 .bg::before { content: ""; position: absolute; inset: 0; z-index: 1; background: radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(0, 0, 0, .55)); }
 /* フィルムの粒：ノイズの模様を少しずつずらして、ちらつかせる */
-.bg::after { content: ""; position: absolute; inset: -60px; z-index: 2; opacity: .14; animation: grain .8s steps(5) infinite;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 160px; }
+.bg::after { content: ""; position: absolute; inset: -60px; z-index: 2; opacity: .26; animation: grain .8s steps(5) infinite;  /* 2026-11-02 たくみ「ざらざらした質感」で粒を強く */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 160px; }
+
+/* 画面全体に重ねる、ブラウン管のような質感（2026-11-02 たくみ「レトロなゲームっぽさと、ざらざらした質感」）。
+   細い走査線と、粗い粒をごくうすく。読む部分の上にも乗るが、文字が読みにくくならない濃さにとどめる。クリックは下へ通す */
+.crt { position: fixed; inset: 0; z-index: 70; pointer-events: none; mix-blend-mode: overlay; opacity: .55;
+  background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, .35) 2px 3px); }
+.crt::after { content: ""; position: absolute; inset: -40px; opacity: .35; animation: grain 1s steps(4) infinite;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 120px 120px; }
 @keyframes grain { 20% { translate: -18px 12px; } 40% { translate: 14px -20px; } 60% { translate: -10px -14px; } 80% { translate: 20px 16px; } }
 
 /* ゲームの窓：少し透ける暗い面に細い線。左上に窓の名前の札が乗る */
@@ -76,9 +83,11 @@ a { color: var(--accent-hi); }
     linear-gradient(var(--accent-hi) 0 0) bottom right / var(--c) 3px, linear-gradient(var(--accent-hi) 0 0) bottom right / 3px var(--c),
     var(--surface);
   background-repeat: no-repeat; background-origin: border-box; }
+/* 角はドット絵のように階段状に（2026-11-02 たくみ「レトロなゲームっぽさ」） */
+.win, .work-img { clip-path: polygon(0 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 4px) calc(100% - 8px), calc(100% - 4px) calc(100% - 4px), calc(100% - 8px) calc(100% - 4px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 8px), 0 calc(100% - 8px)); }
 .win { position: relative; border: 1px solid var(--accent-line); box-shadow: inset 0 0 0 5px rgba(0, 0, 0, .25), inset 0 0 0 6px rgba(138, 156, 236, .12);
-  backdrop-filter: blur(10px); padding: 40px clamp(18px, 3vw, 36px) 28px; }
-.win-t { position: absolute; left: 22px; top: 0; translate: 0 -50%; background: var(--accent); color: #fff; font: 500 15px/1 var(--mincho);
+  backdrop-filter: blur(10px); padding: 58px clamp(18px, 3vw, 36px) 28px; }
+.win-t { position: absolute; left: 22px; top: 10px; background: var(--accent); color: #fff; font: 500 15px/1 var(--mincho);
   letter-spacing: .12em; padding: 9px 26px 10px 22px; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
 .win-t::after { content: ""; position: absolute; right: 14px; top: 50%; width: 5px; height: 5px; background: rgba(255, 255, 255, .7); rotate: 45deg; translate: 0 -50%; }
 
@@ -94,7 +103,7 @@ a { color: var(--accent-hi); }
   padding: 12px var(--side); border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 24px; }
 .hud-name { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
 .hud-name b { font: 400 22px/1 var(--serif); }
-.hud-name span { font-size: 12px; color: var(--muted); }
+.hud-name span { font: 300 17px/1 var(--serif); letter-spacing: .04em; color: var(--muted); }  /* 2026-11-02 たくみ「Portfolio にして」。英字なのでセリフ体 */
 .hud nav { display: flex; justify-content: flex-end; gap: 4px 28px; overflow-x: auto; scrollbar-width: none; padding-left: 1.4em; }
 .hud nav::-webkit-scrollbar { display: none; }
 .hud nav a { font: 400 17px/1 var(--serif); color: var(--muted); text-decoration: none; padding: 8px 0; white-space: nowrap; }
@@ -283,6 +292,11 @@ html.locked, html.locked body { overflow: hidden; }
    右側にゆっくり浮かんで回り、スクロールでも回り、マウス・指の方へ少し傾く。窓は少し透けるので、後ろに見える。
    形は Blender で作った gem.glb（元は gem.blend）。読み込めないときは three.js で近い形を描く */
 .gem { position: absolute; right: max(-6vw, calc((100vw - var(--wrap)) / 2 - 20vw)); top: 42%; translate: 0 -50%; width: min(30vw, 480px); aspect-ratio: 1; }
+/* クリスタルは Blender の Cycles で描いた一周36コマ（2026-11-02 たくみ「A＋B」の B）。黒い背景の絵なので「スクリーン」で重ねて、黒を透かし光だけを乗せる。
+   コマとコマの間はなめらかに重ねて切り替え、時間でゆっくり、スクロールでも回る。外側に青い光のにじみ */
+.crystal-seq { aspect-ratio: 2 / 3; mix-blend-mode: screen; filter: drop-shadow(0 0 28px rgba(79, 120, 255, .45)); }
+/* コントローラーも Cycles で描いた一周36コマ（2026-11-02 たくみ「B（Cycles）で描く」）。背景は透明の絵なので、そのまま重ねて、うしろに青い光のにじみ */
+.pad-seq { filter: drop-shadow(0 18px 36px rgba(46, 69, 163, .55)); }
 /* ゲームのコントローラー（2026-11-02 たくみ「コントローラーも作って」）。Blender で作った controller.glb。左下の余白に、ひし形と向かい合うように */
 .pad { position: absolute; left: max(-3vw, calc((100vw - var(--wrap)) / 2 - 14vw)); top: 80%; translate: 0 -50%; width: min(28vw, 440px); aspect-ratio: 1; }
 
@@ -321,15 +335,16 @@ html.locked, html.locked body { overflow: hidden; }
   .skip { width: 64px; height: 64px; bottom: 48px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .spin, .spin.rev, .title-bg i, .flow i, .bg::after, .d-ring, .start::before, .talk::after, .sel::before, .stage summary:hover::after { animation: none; }
+  .spin, .spin.rev, .title-bg i, .flow i, .bg::after, .crt::after, .d-ring, .start::before, .talk::after, .sel::before, .stage summary:hover::after { animation: none; }
   .title-bg { animation: none; opacity: 1; }
 }
 </style>
 
+<div class="crt" aria-hidden="true"></div>
 <div class="bg" aria-hidden="true">
   <div class="smoke"><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow pointer"><i></i></span></div>
-  <canvas class="gem m3d" data-model="gem.glb" data-kind="gem"></canvas>
-  <canvas class="pad m3d" data-model="controller.glb" data-kind="pad"></canvas>
+  <canvas class="gem crystal-seq seq" data-frames="crystal/crystal_{i}.webp" data-count="36" data-global="CRYSTAL_FRAMES" data-blend="lighter" data-speed="4"></canvas>
+  <canvas class="pad pad-seq seq" data-frames="pad/pad_{i}.webp" data-count="36" data-global="PAD_FRAMES" data-blend="source-over" data-speed="2.4"></canvas>
   <div class="deco">
     <span class="d-ring" style="--x:5%;--y:18%;--r:140px;--k:30;--o:.55"></span>
     <span class="d-cross" style="--x:93%;--y:14%;--k:50"></span>
@@ -358,13 +373,13 @@ html.locked, html.locked body { overflow: hidden; }
     <p class="intro" lang="en" aria-hidden="true">Hello.</p>
     <a class="start" href="#status" lang="en">Start</a>
   </div>
-  <canvas class="title-3d" data-model="handheld.glb" aria-hidden="true"></canvas>
+  <canvas class="title-3d" data-model="handheld.glb" data-hdr="studio_small_09_1k.hdr" aria-hidden="true"></canvas>
   <button class="skip" type="button" lang="en" aria-label="Skip the intro">Skip</button>
   <div class="load" aria-hidden="true"><i></i></div>
 </header>
 
 <div class="hud">
-  <p class="hud-name"><b>Tono Takumi</b><span>ゲーム広告の運用・営業</span></p>
+  <p class="hud-name"><b>Tono Takumi</b><span lang="en">Portfolio</span></p>
   <nav aria-label="目次">
     <a class="sel" href="#status">Home</a><a class="sel" href="#work">Work</a><a class="sel" href="#about">About</a>
   </nav>
@@ -565,14 +580,48 @@ html.locked, html.locked body { overflow: hidden; }
 </script>
 
 <!-- three.js は jsDelivr から、2週間以上前に出た r186（0.186.0）に固定して読み込む -->
+<script>
+// コマ送り（クリスタル・コントローラー）：Blender の Cycles で描いた一周36コマを読み込んで、時間とスクロールで回す。
+// 見せる用では、コマはページに埋め込まれている（window.CRYSTAL_FRAMES・window.PAD_FRAMES）
+document.querySelectorAll("canvas.seq").forEach(cv => {
+  if (getComputedStyle(cv).display === "none") return;  // スマホで隠しているものは読み込まない
+  const n = +cv.dataset.count, speed = +cv.dataset.speed, blend = cv.dataset.blend;
+  const list = window[cv.dataset.global] || Array.from({ length: n }, (_, i) => cv.dataset.frames.replace("{i}", String(i).padStart(2, "0")));
+  const imgs = list.map(src => { const im = new Image(); im.decoding = "async"; im.src = src; return im; });
+  const g = cv.getContext("2d"), still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fit = () => { const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio); cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d); };
+  addEventListener("resize", fit); fit();
+  const draw = pos => {
+    const i = Math.floor(pos) % n, j = (i + 1) % n, k = pos - Math.floor(pos);
+    g.globalCompositeOperation = "source-over"; g.clearRect(0, 0, cv.width, cv.height);
+    if (!imgs[i].complete || !imgs[j].complete) return;
+    g.globalAlpha = 1; g.drawImage(imgs[i], 0, 0, cv.width, cv.height);
+    g.globalCompositeOperation = blend; g.globalAlpha = k; g.drawImage(imgs[j], 0, 0, cv.width, cv.height);  // 次のコマをうすく重ねて、なめらかに
+    g.globalAlpha = 1;
+  };
+  // decode() は隠れたタブで終わらないことがあるので、読み込み完了（load）を待つ
+  Promise.all(imgs.map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; }))).then(() => {
+    draw(0);  // まず1コマ目を出しておく
+    if (still) return;
+    const t0 = performance.now();
+    // rAF の時刻は t0 より少し前になることがあるので、0 未満にしない（マイナスのコマ番号で止まらないように）
+    const loop = now => { draw((Math.max(0, now - t0) / 1000 * speed + scrollY / innerHeight * 10) % n); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+});
+</script>
+
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.min.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/" } }</script>
 <script type="module">
 // Blender で作った3D（ひし形 gem.glb・コントローラー controller.glb）を、それぞれの canvas に描く。
 // 読み込めないとき：ひし形は three.js で近い形を描き、コントローラーは出さない
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
 
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const hdrUrl = document.querySelector(".title-3d")?.dataset.hdr || "studio_small_09_1k.hdr";
 let px = 0, py = 0;
 addEventListener("pointermove", e => { px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; }, { passive: true });
 const loader = new GLTFLoader();
@@ -593,12 +642,49 @@ const withEdges = root => {
   return root;
 };
 
+
+// クリスタルの見た目（Blender の形に、ページ側で質感をのせる）：透ける群青、虹色の照り、内側の光の芯、辺の細い光
+const glowTex = (() => {
+  const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+  const r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  r.addColorStop(0, "rgba(160,190,255,.9)"); r.addColorStop(.25, "rgba(90,130,255,.45)"); r.addColorStop(.6, "rgba(46,69,163,.15)"); r.addColorStop(1, "rgba(46,69,163,0)");
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+})();
+const dressCrystal = (root, group) => {
+  const shell = new THREE.MeshPhysicalMaterial({ color: 0x5f84f0, emissive: 0x2e45a3, emissiveIntensity: 1.15, roughness: .04, metalness: 0,
+    clearcoat: 1, clearcoatRoughness: .05, iridescence: .7, iridescenceIOR: 1.35, transparent: true, opacity: .86, flatShading: true, side: THREE.DoubleSide, depthWrite: false });
+  const core = new THREE.MeshBasicMaterial({ color: 0x4f7bff, transparent: true, opacity: .6, blending: THREE.AdditiveBlending, depthWrite: false });
+  const meshes = []; root.traverse(o => { if (o.isMesh) meshes.push(o); });
+  for (const o of meshes) {
+    o.material = shell;
+    const inner = new THREE.Mesh(o.geometry, core); inner.scale.setScalar(.72); o.add(inner);  // 内側の光の芯
+    o.add(new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 20), new THREE.LineBasicMaterial({ color: 0x9fb8ff, transparent: true, opacity: .35, blending: THREE.AdditiveBlending })));
+  }
+  // うしろの光のにじみ（ゆっくり明るさが脈打つ）
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+  halo.scale.set(7, 8, 1); halo.position.z = -1; group.add(halo);
+  // 周りにきらめく粒：ゆっくり昇りながら、明滅する
+  const n = 70, pos = new Float32Array(n * 3), seed = new Float32Array(n);
+  for (let i = 0; i < n; i++) { pos.set([(Math.random() - .5) * 3.4, (Math.random() - .5) * 4.2, (Math.random() - .5) * 2], i * 3); seed[i] = Math.random() * 10; }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const spark = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xcfe0ff, size: .06, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false }));
+  group.add(spark);
+  return { halo, spark, pos, seed, n };
+};
+
 document.querySelectorAll("canvas.m3d").forEach(canvas => {
   if (getComputedStyle(canvas).display === "none") return;  // スマホで隠しているものは読み込まない
   const kind = canvas.dataset.kind;
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = .9;
   const scene = new THREE.Scene();
+  // 映り込み：まず部屋の光、撮影スタジオの HDRI が読めたら差し替える（スタート画面と同じもの）
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+  scene.environmentIntensity = .5;
+  new HDRLoader().load(hdrUrl, hdr => { hdr.mapping = THREE.EquirectangularReflectionMapping; scene.environment = pmrem.fromEquirectangular(hdr).texture; hdr.dispose(); view.draw(); }, undefined, () => {});
   const camera = new THREE.PerspectiveCamera(30, 1, .1, 50);
   camera.position.set(0, 0, kind === "pad" ? 9 : 8);
   // 光：上から白、左下から明るい群青、うしろから濃い群青で縁を立てる
@@ -620,10 +706,11 @@ document.querySelectorAll("canvas.m3d").forEach(canvas => {
     obj.position.multiplyScalar(s);
     group.add(obj);
     if (kind === "pad") group.rotation.set(1.05, .25, 0);  // ボタンのある面がこちらを向くように（止まっているときも）
+    if (kind === "gem") view.fx = dressCrystal(obj, group);
     view.draw();
   };
   loader.load(canvas.dataset.model,
-    gltf => put(kind === "gem" ? withEdges(gltf.scene) : gltf.scene),
+    gltf => put(gltf.scene),
     undefined,
     () => { if (kind === "gem") put(withEdges(placeholder())); });
 
@@ -650,10 +737,19 @@ if (!still && views.length) {
         g.rotation.z += (Math.sin(t * .5) * .08 - px * .25 - g.rotation.z) * .05;
         g.position.y = Math.sin(t * .9 + 1) * .1;
       } else {
-        g.rotation.y = t * .35 + sy * .9;
-        g.rotation.x += (py * .5 - g.rotation.x) * .05;
-        g.rotation.z += (-px * .3 - g.rotation.z) * .05;
+        // クリスタルは傾きを小さく保ったまま縦の軸で回る。光のにじみは脈打ち、粒は昇って明滅する
+        const crystal = g.children.find(c => !c.isSprite && !c.isPoints);
+        if (crystal) crystal.rotation.y = t * .35 + sy * .9;
+        g.rotation.x += (py * .25 - g.rotation.x) * .05;
+        g.rotation.z += (-px * .2 + .12 - g.rotation.z) * .05;
         g.position.y = Math.sin(t * .8) * .12;
+        const fx = v.fx;
+        if (fx) {
+          fx.halo.material.opacity = .75 + Math.sin(t * 1.6) * .25;
+          for (let i = 0; i < fx.n; i++) { const j = i * 3 + 1; fx.pos[j] += .004; if (fx.pos[j] > 2.1) fx.pos[j] = -2.1; }
+          fx.spark.geometry.attributes.position.needsUpdate = true;
+          fx.spark.material.opacity = .55 + Math.sin(t * 3) * .25;
+        }
       }
       v.draw();
     }
@@ -666,6 +762,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
 
 const title = document.querySelector(".title"), canvas = title?.querySelector(".title-3d"), line = title?.querySelector(".intro");
 if (canvas) (async () => {
@@ -680,6 +777,11 @@ if (canvas) (async () => {
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
   scene.environmentIntensity = .35;  // 映り込みは控えめに（強いと群青が白っぽくなる）
+  // 撮影スタジオの HDRI（Poly Haven・CC0、2026-11-02 たくみ OK でダウンロード）が読めたら差し替える。読めなくてもそのまま進む
+  if (canvas.dataset.hdr) new HDRLoader().load(canvas.dataset.hdr, hdr => {
+    hdr.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = pmrem.fromEquirectangular(hdr).texture; scene.environmentIntensity = .55; hdr.dispose();
+  }, undefined, () => {});
   const camera = new THREE.PerspectiveCamera(30, 1, .05, 100);
   const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(3, 5, 6); scene.add(key);
   const rim = new THREE.PointLight(0x8a9cec, 60, 30); rim.position.set(-4, -2, 3); scene.add(rim);
