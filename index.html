@@ -274,8 +274,17 @@ html.locked, html.locked body { overflow: hidden; }
 
 /* 左右の余白に散らす細かい飾り（2026-11-02 たくみ「装飾や細かいデザインはちりばめて」）。読む部分には重ねない。
    画面に固定し、スクロールで深さ（--k）に応じて少しずつ上へずれて奥行きを出す。狭い画面では数を減らして薄く */
-.deco { position: absolute; inset: 0; z-index: 1; }
-.deco > * { position: absolute; left: var(--x); top: var(--y); translate: 0 calc(var(--sy, 0) * var(--k, 20) * -1px); opacity: var(--o, .5); }
+.deco { position: absolute; inset: 0 0 auto 0; height: 100vh; z-index: 1; }
+.deco > * { position: absolute; left: var(--x); top: var(--y); opacity: var(--o, .5); }
+/* 流れる飾りの入れ物：ページの左上から、ページの高さぶん（高さはスクリプトで入れる）。はみ出しは切る */
+.drift { position: absolute; top: 0; left: 0; width: 100%; height: var(--doc-h, 100vh); overflow: hidden; z-index: -1; pointer-events: none; }
+/* クリスタル（2026-11-02 たくみ「gem.blend を結構そのまま使って」「サイズや形をばらばらに」）：たくみが用意した結晶のモデルを、Blender の Cycles で
+   角度を変えて6枚描いた絵（crystal2/、描く手順は crystal2/crystal_render.py。3D のファイルは公開しない）。大きさ・傾き・左右の向きをばらばらにして、
+   ページ全体の左右の端に置く。小さいものは奥にあるように少しぼかして薄く。それぞれの周期でゆっくり上下に漂う */
+.cr { position: absolute; height: auto; rotate: var(--r); scale: var(--f) 1; opacity: var(--o); filter: blur(var(--b)) drop-shadow(0 0 22px rgba(120, 90, 255, .35));
+  animation: cr-float var(--t) ease-in-out var(--dl) infinite alternate; }
+@keyframes cr-float { from { translate: 0 0; } to { translate: 0 -18px; } }
+@media (prefers-reduced-motion: reduce) { .cr { animation: none; } }
 .d-ring { width: var(--r, 120px); aspect-ratio: 1; border: 1px solid rgba(236, 235, 230, .28); border-radius: 50%; animation: spin var(--d, 60s) linear infinite; }
 .d-ring.dash { border-style: dashed; border-color: rgba(138, 156, 236, .45); }
 .d-ring::after { content: ""; position: absolute; left: 50%; top: -3px; width: 5px; height: 5px; background: var(--accent-hi); rotate: 45deg; translate: -50% 0; }
@@ -295,7 +304,7 @@ html.locked, html.locked body { overflow: hidden; }
 /* ちりばめ：ページ全体に浮かべるクリスタルとアイテム（背景に固定。スクロールで奥行きごとに動く） */
 .scatter { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* ゲームのコントローラー（2026-11-02 たくみ「コントローラーも作って」）。Blender で作った controller.glb。左下の余白に、ひし形と向かい合うように */
-.pad { position: absolute; left: max(-3vw, calc((100vw - var(--wrap)) / 2 - 14vw)); top: 80%; translate: 0 -50%; width: min(28vw, 440px); aspect-ratio: 1; }
+.pad { position: absolute; left: max(-3vw, calc((100vw - var(--wrap)) / 2 - 14vw)); top: 80vh; translate: 0 -50%; width: min(28vw, 440px); aspect-ratio: 1; }
 /* コントローラーは、たくみが用意したモデルを Blender の Cycles で黒×ネオンに描いた1枚の絵（2026-11-02 たくみ「PS5で進める」）。ロゴと文字は消してある。
    ライセンスの都合で 3D のファイルは置かず、絵だけを置く。ゆっくり浮かんで少し傾く（点滅や切り替えはしない） */
 .pad-img { aspect-ratio: auto; height: auto; object-fit: contain; animation: pad-float 9s ease-in-out infinite; }
@@ -303,7 +312,7 @@ html.locked, html.locked body { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .pad-img { animation: none; } }
 /* 携帯ゲーム機（2026-11-02 たくみ「これも追加して」）。たくみが用意した Switch のモデルを、PS5 と同じ黒×ネオンで描いた1枚の絵（switch/switch.webp）。
    ボタンの文字とロゴは消してある。右下で、左下のコントローラーと向かい合う。少しずらした周期で浮かぶ */
-.switch-img { position: absolute; right: max(2vw, calc((100vw - var(--wrap)) / 2 - 10vw)); top: 84%; translate: 0 -50%; width: min(24vw, 380px); height: auto; animation: pad-float 11s ease-in-out -4s infinite reverse; }
+.switch-img { position: absolute; right: max(2vw, calc((100vw - var(--wrap)) / 2 - 10vw)); top: 84vh; translate: 0 -50%; width: min(24vw, 380px); height: auto; animation: pad-float 11s ease-in-out -4s infinite reverse; }
 @media (prefers-reduced-motion: reduce) { .switch-img { animation: none; } }
 
 @media (max-width: 899px) {
@@ -350,9 +359,11 @@ html.locked, html.locked body { overflow: hidden; }
 <div class="bg" aria-hidden="true">
   <div class="smoke"><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow"><i></i></span><span class="flow pointer"><i></i></span></div>
   <canvas class="scatter"></canvas>
-  <canvas class="gem m3d" data-model="gem.glb" data-kind="gem"></canvas>
-  <img class="pad pad-img" src="ps5/pad_ps5.webp" alt="" aria-hidden="true">
-  <img class="switch-img" src="switch/switch.webp" alt="" aria-hidden="true">
+</div>
+<!-- 画面に固定しない飾り（2026-11-02 たくみ「スクロールして固定のものはなくして」）：ページと一緒に流れる。クリスタルは下のスクリプトでページ全体に並べる -->
+<div class="drift" aria-hidden="true">
+  <img class="pad pad-img" src="ps5/pad_ps5.webp" alt="">
+  <img class="switch-img" src="switch/switch.webp" alt="">
   <div class="deco">
     <span class="d-ring" style="--x:5%;--y:18%;--r:140px;--k:30;--o:.55"></span>
     <span class="d-cross" style="--x:93%;--y:14%;--k:50"></span>
@@ -627,29 +638,54 @@ const glowTex = (() => {
   r.addColorStop(0, "rgba(160,190,255,.9)"); r.addColorStop(.25, "rgba(90,130,255,.45)"); r.addColorStop(.6, "rgba(46,69,163,.15)"); r.addColorStop(1, "rgba(46,69,163,0)");
   g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
 })();
-// クリスタル：下のとげとげはなくし、上下がとがった一つの結晶にする。まわりに大中小の結晶と小さな粒をちりばめる（2026-11-02 たくみ）
-// 形は六角柱の上下をとがらせたもの（回転体を6面で作る）
-const crystalGeo = (() => {
-  const g = new THREE.LatheGeometry([new THREE.Vector2(0, -1.55), new THREE.Vector2(.56, -.7), new THREE.Vector2(.56, .7), new THREE.Vector2(0, 1.65)], 6);
-  g.computeVertexNormals(); return g;
-})();
+// クリスタル（2026-11-02 たくみ「自作の3Dで、参考と同じものを作って」）：参考（CGTrader の Crystal）のデータは使わず、見た目だけを近づけてページ側で作る。
+// 参考の特徴：太さと高さの比がおよそ 1:2.3 のずんぐりした1本の結晶、少し片寄った先のとがり、先の近くに細かい面、柱は少し波打つ面、
+// 平らな底。色は下が濃い青、真ん中が青紫、上がラベンダーピンクのガラス。表面に流れるような映り込み
+// 形は決まった並びの乱数（seed）で作る。seed を変えると、同じ作りで形の違う結晶になる（ちりばめで使う）
+const makeCrystalGeo = seed => {
+  let s = seed; const r = () => (s = (s * 16807) % 2147483647) / 2147483647 - .5;
+  const N = 12;  // 6つの面を、それぞれ2つに割る（割り目を少し外へ押して、平らすぎない面にする）
+  const base6 = Array.from({ length: 6 }, () => .56 * (1 + r() * .3));  // 太さ：高さのおよそ 1/2.3（参考のずんぐりした比）
+  const rad = Array.from({ length: N }, (_, i) => i % 2 ? (base6[(i - 1) / 2] + base6[(i + 1) / 2 % 6]) / 2 * (1.0 + r() * .12) : base6[i / 2]);
+  const ang = Array.from({ length: N }, (_, i) => (i + r() * .25) / N * Math.PI * 2);
+  // 段：底から先まで。k は太さ、jy は高さのずれ、jr は太さのずれ（上ほど不ぞろい）
+  const rings = [[-1.0, .9, .03, .04], [-.62, .98, .06, .05], [-.2, 1, .07, .05], [.22, 1, .08, .06], [.58, .97, .1, .07], [.86, .82, .14, .1], [1.1, .5, .14, .2]];
+  const R = rings.map(([y, k, jy, jr]) => ang.map((a, i) => { const q = rad[i] * k * (1 + r() * jr * 2); return new THREE.Vector3(Math.cos(a) * q, y + r() * jy * 2, Math.sin(a) * q * .88); }));
+  const apex = new THREE.Vector3(.1 + r() * .1, 1.42 + r() * .1, -.04 + r() * .1), base = new THREE.Vector3(r() * .05, -1.04, r() * .05);
+  const pos = [], uv = [], tri = (...v) => v.forEach(p => { pos.push(p.x, p.y, p.z); uv.push((Math.atan2(p.z, p.x) / (Math.PI * 2) + 1) % 1, (p.y + 1.1) / 2.6); });
+  for (let k = 0; k < R.length - 1; k++) for (let i = 0; i < N; i++) { const j = (i + 1) % N, A = R[k], B = R[k + 1]; tri(A[i], B[i], B[j]); tri(A[i], B[j], A[j]); }
+  const T = R[R.length - 1], Bt = R[0];
+  for (let i = 0; i < N; i++) { const j = (i + 1) % N; tri(T[i], apex, T[j]); tri(Bt[j], base, Bt[i]); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  // 色：下の濃い青 → 青紫 → 紫 → 上のラベンダーピンク
+  const stops = [[-1.05, 0x1d34d8], [-.35, 0x3540d6], [.35, 0x6a4fd8], [.95, 0xa77ee0], [1.5, 0xe2b4ee]].map(([y, h]) => [y, new THREE.Color(h)]);
+  const col = [], c = new THREE.Color();
+  for (let i = 1; i < pos.length; i += 3) {
+    const y = pos[i]; let k = 0; while (k < stops.length - 2 && y > stops[k + 1][0]) k++;
+    c.lerpColors(stops[k][1], stops[k + 1][1], THREE.MathUtils.clamp((y - stops[k][0]) / (stops[k + 1][0] - stops[k][0]), 0, 1)); col.push(c.r, c.g, c.b);
+  }
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+  g.computeVertexNormals(); g.center(); return g;
+};
+const crystalGeo = makeCrystalGeo(11);
+// 表面の流れるような映り込み（筋の凹凸）は付けない（2026-11-02 たくみ「なくして」）
+// 結晶のガラス（ちりばめ・主役・スティックの頭で共通）。頂点の色がガラスの色になる
+const crystalGlass = (transmission = .55) => new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, metalness: .05, roughness: .05, transmission, thickness: 1, ior: 1.5,
+  attenuationColor: 0x5a48d8, attenuationDistance: 1.6, clearcoat: .8, clearcoatRoughness: .05, envMapIntensity: 1.8,
+  emissive: 0x15185c, emissiveIntensity: .35, iridescence: .15, iridescenceIOR: 1.3, flatShading: true });
+// 中の割れ目のような面：少し小さく写して回した形を2つ、外のガラスを通して透けて見えるように重ねて描く（中で光が折れて見える感じ）
+const crystalInner = new THREE.MeshStandardMaterial({ vertexColors: true, color: 0xc9ccff, roughness: .05, metalness: .6, transparent: true, opacity: .18, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, flatShading: true, envMapIntensity: 2 });
+const makeCrystal = (geo, glass) => {
+  const m = new THREE.Mesh(geo, glass);
+  for (const [k, ry] of [[.74, .9], [.5, 2.3]]) { const c = new THREE.Mesh(geo, crystalInner); c.scale.set(k, .88, k); c.rotation.y = ry; c.renderOrder = 1; m.add(c); }
+  return m;
+};
 const buildCrystals = group => {
-  // 透けて奥が屈折するガラス、うすい群青の吸収、虹色の照り
-  // 半分透ける群青のガラス。面ごとに映り込みが変わり、カットした宝石のように見える
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0x5677e8, metalness: .15, roughness: .2, transmission: .55, thickness: 1, ior: 1.6,
-    attenuationColor: 0x3f5fd8, attenuationDistance: 1.2, clearcoat: .25, clearcoatRoughness: .35, envMapIntensity: 1.1,
-    emissive: 0x16246e, emissiveIntensity: .5, iridescence: .15, iridescenceIOR: 1.3, flatShading: true });
-  const main = new THREE.Mesh(crystalGeo, glass);
-  const core = new THREE.Mesh(crystalGeo, new THREE.MeshBasicMaterial({ color: 0x5f86ff })); core.scale.set(.12, .6, .12); main.add(core);  // 中心の細い光の芯
-  main.scale.setScalar(.82);
+  const main = makeCrystal(crystalGeo, crystalGlass()); main.scale.setScalar(1.1);
   group.add(main);  // 動きの処理は、最初の子を主役として回す
-  // うしろの白っぽい光のにじみは付けない（2026-11-02 たくみ「周りが白くなるものもやめて」）
-  // 大中小の結晶と粒は、主役のまわりではなくページ全体にちりばめる（下の「ちりばめ」。2026-11-02 たくみ）
   return {};
 };
-const crystalGlass = () => new THREE.MeshPhysicalMaterial({ color: 0x4566d8, metalness: .15, roughness: .2, transmission: .4, thickness: 1, ior: 1.6,
-  attenuationColor: 0x3f5fd8, attenuationDistance: 1.2, clearcoat: .25, clearcoatRoughness: .35, envMapIntensity: 1.1,
-  emissive: 0x16246e, emissiveIntensity: .5, iridescence: .15, iridescenceIOR: 1.3, flatShading: true });
 
 // コントローラー：つや消しの黒い本体に、十字キーは水色、ボタンはピンクの光る縁（2026-11-02 たくみの参考画像の雰囲気。絵や形は写さない）
 const dressPad = root => {
@@ -727,7 +763,7 @@ const buildFacetPad = () => {
     const ring = prism(.1, .03, 8, pink); ring.position.y = -.025; btn.add(ring);
   }
   // スティック：八角の台、六角の軸、頭は群青のガラス（クリスタルと同じ質感）
-  const capMat = crystalGlass();
+  const capMat = crystalGlass(); capMat.vertexColors = false; capMat.color.set(0x5a5cf2);  // 円柱には頂点の色がないので、色を直接入れる
   for (const sx of [-1, 1]) {
     at(flat(new THREE.CylinderGeometry(.21, .24, .05, 8), dark), sx * .5, -.12, .02);
     at(prism(.065, .14, 6, dark), sx * .5, -.12, .1);
@@ -872,28 +908,26 @@ if (scatterCanvas && getComputedStyle(scatterCanvas).display !== "none") {
   const camera = new THREE.PerspectiveCamera(30, 1, .1, 60); camera.position.z = 12;
   const UNIT = 2 * 12 * Math.tan(THREE.MathUtils.degToRad(15));  // 画面1枚ぶんの高さ（奥行き 0 のところ）
 
-  // アイテムはゲーム機だけ（2026-11-02 たくみ「クリスタルとゲーム機でお願い」）。形は角ばったゲーム機（buildFacetHandheld）にそろえる（同日「そろえる」）
-  const slots = [];  // ゲーム機を入れる場所。下で並べ終えたら、それぞれに1台ずつ入れる
-
-  // 決まった並びの乱数（読み込むたびに配置が変わらないように）
+  // 3D のクリスタル（2026-11-02 たくみ「自作の3Dで」「サイズや形をばらばらに」）：形の違う結晶を5種類作り、大きさ・太さ・傾きをばらばらにして、
+  // ページ全体の左右の端に並べる。この canvas は画面に貼ってあるが、カメラがスクロールに合わせて下りるので、結晶はページと一緒に流れる（画面に固定されない）
+  // 角ばったゲーム機は使わない（2026-11-02 たくみ「不要」。buildFacetHandheld は残している）
   let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const glass = crystalGlass(), objs = [];
-  const add = (m, k, row, side, depth, spin) => { m.scale.setScalar(k); m.rotation.set((rnd() - .5) * .8, rnd() * 6, (rnd() - .5) * .8); scene.add(m); objs.push({ m, row, side, depth, spin, phase: rnd() * 6 }); };
-  // 画面1枚ぶんを1段として、段ごとに左右の端へ置く（文章のカードの裏に隠れないよう、真ん中はあける）
+  const objs = [], glass = crystalGlass(), geos = [11, 29, 47, 83, 131].map(makeCrystalGeo);
+  const add = (m, k, row, side, depth, spin) => {
+    const w = .85 + rnd() * .3; m.scale.set(k * w, k * (.85 + rnd() * .3), k * w);  // 太さと高さを少しずつ変える
+    m.rotation.set((rnd() - .5) * 1.1, rnd() * 6, (rnd() - .5) * 1.1); scene.add(m); objs.push({ m, row, side, depth, spin, phase: rnd() * 6 });
+  };
   const rows = Math.ceil(document.documentElement.scrollHeight / innerHeight) + 1, small = innerWidth < 700;
+  // 大きさの目安：k = 1 で高さが画面のおよそ 4 割。いちばん大きいものでも画面の 3 割ほどに抑える（2026-11-02 たくみ「でかすぎる」）
+  add(makeCrystal(geos[0], glass), .75, -.08, .66, 0, .25);  // 最初の画面の右に、少し大きいものを1つ
   for (let r = 0; r < rows; r++) {
-    for (let i = 0; i < (small ? 2 : 4); i++) {
-      const side = (i % 2 ? 1 : -1) * (.62 + rnd() * .36), row = r + rnd(), depth = -rnd() * 5;
-      if (r === 0 && side > 0) continue;  // 最初の画面の右は主役のクリスタルの場所
-      const big = rnd(), k = big > .85 ? .7 : big > .5 ? .42 : .24;  // 大・中・小
-      const cm = new THREE.Mesh(crystalGeo, glass); add(cm, k, row, side, depth, .2 + rnd() * .3);
+    for (let i = 0; i < (small ? 3 : 6); i++) {
+      const side = (i % 2 ? 1 : -1) * (.6 + rnd() * .4), row = r + rnd(), depth = -rnd() * 3;
+      const t = rnd(), k = t < .4 ? .12 + rnd() * .08 : t < .72 ? .22 + rnd() * .13 : t < .92 ? .4 + rnd() * .2 : .65 + rnd() * .2;  // 極小・小・中・大
+      if (r === 0 && side > 0 && row < .7 && k > .2) continue;  // 最初の画面の右上は少し大きい結晶の場所
+      add(makeCrystal(geos[Math.floor(rnd() * geos.length)], glass), k, row, side, depth, .15 + rnd() * .35);
     }
-    // 段ごとにゲーム機を1つ（左右を交互に）
-    const side = (r % 2 ? 1 : -1) * (.6 + rnd() * .3);
-    if (!(r === 0 && side > 0)) { const g = new THREE.Group(); slots.push(g); add(g, .8 + rnd() * .4, r + .3 + rnd() * .5, side, -rnd() * 1.5, .15 + rnd() * .2); g.rotation.x = (rnd() - .5) * .4; g.rotation.z = (rnd() - .5) * .3; }
   }
-  const unit = buildFacetHandheld(); unit.scale.setScalar(1.7 / 3.66); unit.rotation.x = Math.PI / 2 - .35;  // ボタンのある面をこちらへ（外側の入れ物が縦の軸で回る）
-  for (const g of slots) g.add(unit.clone());
   // 小さな粒：ページ全体にうすく。明るさは一定
   const n = rows * (small ? 25 : 45), pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) pos.set([(rnd() - .5) * 2.4, -rnd() * rows * UNIT, -rnd() * 6], i * 3);
@@ -911,11 +945,51 @@ if (scatterCanvas && getComputedStyle(scatterCanvas).display !== "none") {
   addEventListener("resize", fit); fit();
   const draw = t => {
     camera.position.y = -scrollY / innerHeight * UNIT;
-    for (const o of objs) { o.m.rotation.y = t * o.spin + o.phase; o.m.position.y = o.y + Math.sin(t * .5 + o.phase) * .06; }
+    for (const o of objs) { o.m.rotation.y = t * o.spin + o.phase + scrollY / innerHeight * .6; o.m.position.y = o.y + Math.sin(t * .5 + o.phase) * .06; }
+    scene.rotation.x += (py * .12 - scene.rotation.x) * .05; scene.rotation.y += (px * .12 - scene.rotation.y) * .05;  // マウス・指の方へ少し傾く
     renderer.render(scene, camera);
   };
   if (still) { draw(0); addEventListener("scroll", () => draw(0), { passive: true }); }
   else renderer.setAnimationLoop(() => draw(clock.getElapsedTime()));
+}
+
+// 流れる飾りの入れ物（PS5・Switch・線の飾り）の高さをページの高さに合わせる
+const drift = document.querySelector(".drift");
+const driftFit = () => drift?.style.setProperty("--doc-h", document.documentElement.scrollHeight + "px");
+addEventListener("load", driftFit); addEventListener("resize", driftFit); driftFit();
+// 絵のクリスタル（gem.blend を Cycles で描いた6枚）は、自作の3Dに替えたので使わない（2026-11-02）。戻すときは .crystals と .cr-src を HTML に戻す
+const crHost = document.querySelector(".crystals");
+if (drift && crHost) {
+  const srcs = [...crHost.querySelectorAll(".cr-src")].map(i => i.src);
+  const layout = () => {
+    crHost.querySelectorAll(".cr").forEach(e => e.remove());
+    const H = document.documentElement.scrollHeight, W = innerWidth, vh = innerHeight, small = W < 700;
+    drift.style.setProperty("--doc-h", H + "px");
+    let s = 23; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const put = (x, y, w, opt = {}) => {
+      const im = document.createElement("img"); im.className = "cr"; im.alt = ""; im.src = srcs[opt.i ?? Math.floor(rnd() * srcs.length)];
+      const depth = Math.min(1, w / 260);  // 小さいほど奥：薄く、少しぼかす
+      im.style.cssText = `left:${x}px;top:${y}px;width:${w}px;--r:${opt.r ?? (rnd() - .5) * 70}deg;--f:${rnd() < .5 ? -1 : 1};--o:${(.55 + depth * .45).toFixed(2)};--b:${depth < .4 ? 1.2 : 0}px;--t:${(5 + rnd() * 6).toFixed(1)}s;--dl:${(-rnd() * 6).toFixed(1)}s`;
+      crHost.appendChild(im);
+    };
+    // 大きさ：小さいものほど多く（極小・小・中・大）
+    // 大きすぎた（2026-11-02 たくみ）ので、いちばん大きいものでも幅 200px ほどに抑える
+    const size = () => { const k = rnd(); return (k < .4 ? 24 + rnd() * 30 : k < .72 ? 56 + rnd() * 44 : k < .92 ? 100 + rnd() * 50 : 150 + rnd() * 50) * (small ? .6 : 1); };
+    const edge = Math.max(W * .14, (W - 1100) / 2);  // 文章のカードの外側の幅
+    const bw = Math.min(W * .3, 420) * .4;  // 右下の Switch に重ならない大きさ
+    put(W - bw * 1.6 - W * .04, vh * .08, bw, { i: 0, r: 12 });
+    for (let y = vh * .15; y < H - 120; y += vh * (small ? .4 : .22)) {
+      const w = size(), left = rnd() < .5;
+      // 左右の端に置く。ときどき少し画面の外へはみ出させる。小さいものはたまに内側にも
+      const inner = w < 60 && rnd() < .35, span = inner ? W * .5 : edge;
+      const x = left ? -w * .25 + rnd() * span : W - w * .75 - rnd() * span;
+      if (y < vh && !left && w > 60) continue;  // 最初の画面の右は大きいクリスタルの場所
+      put(x, y + (rnd() - .5) * vh * .2, w);
+    }
+  };
+  addEventListener("load", layout);
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(layout, 200); });
+  layout();
 }
 </script>
 <script type="module">
